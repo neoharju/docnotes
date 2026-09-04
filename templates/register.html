@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register</title>
+  </head>
+  <body>
+
+
+    {% for message in get_flashed_messages() %}
+    <p class="info">
+      {{ message }}
+    </p>
+    {% endfor %}
+    <h1>Create an account</h1>
+    <form action="{{ url_for('register') }}" method="post">
+      <p>
+        <label for="username">Username:</label><br />
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          value="{{ filled.username }}" 
+          maxlength="20" 
+          minlength="2"
+          autocomplete="username"
+          required 
+        />
+      </p>
+      <p>
+        <label for="password_1">Password:</label><br />
+        <input 
+          type="password" 
+          id="password_1" 
+          name="password_1"
+          autocomplete="new-password"
+          required
+        />
+      </p>
+      <p>
+        <label for="password_2">Password again:</label><br />
+        <input 
+          type="password" 
+          id="password_2" 
+          name="password_2"
+          autocomplete="new-password"
+          required
+        />
+      </p>
+      <input 
+        type="hidden"
+        name="csrf_token"
+        value="{{ session.csrf_token }}"
+      >
+      <button type="submit">Create account</button>
+    </form>
+
+  </body>
+</html>
