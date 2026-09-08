@@ -1,50 +1,22 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Login</title>
+{% extends "layout.html" %}
 
-  </head>
-  <body>
-    {% for message in get_flashed_messages() %}
-    <p class="info">
-    {{ message }}
-    </p>
-    {% endfor %}
+{% block title %}Log in {% endblock %}
 
-    <h1>Log in</h1>
-    <form action="{{ url_for('login') }}" method="post">
-      <p>
-      <label for="username">Username:</label><br />
-      <input 
-             type="text" 
-             id="username" 
-             name="username"
-             autocomplete="username"
-             required
-             />
-      </p>
-      <p>
-      <label for="password">Password</label>:<br />
-      <input 
-             type="password" 
-             id="password" 
-             name="password"
-             autocomplete="current-password"
-             required
-             />
-      </p>
-      <input 
-             type="hidden"
-             name="next_page"
-             value="{{ next_page | default('/') }}"
-             />
-      <input
-          type="hidden"
-          name="csrf_token"
-          value="{{ session.csrf_token }}"
-          />
+{% block content %}
 
-      <button type="submit">Log in</button>
-    </form>
-  </body>
-</html
+<h1>Log in</h1>
+<form action="{{ url_for('login') }}" method="post">
+	<p>
+		<label for="username">Username:</label><br />
+		<input type="text" id="username" name="username" autocomplete="username" required />
+	</p>
+	<p>
+		<label for="password">Password</label>:<br />
+		<input type="password" id="password" name="password" autocomplete="current-password" required />
+	</p>
+	<input type="hidden" name="next_page" value="{{ next_page | default('/') }}" />
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+
+	<button type="submit">Log in</button>
+</form>
+{% endblock %}

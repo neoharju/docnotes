@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block title %}DocNotes{% endblock %}</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+
+<body>
+  <header>
+    <h1>DocNotes</h1>
+
+    {% if session.user_id %}
+    <p>
+      Logged in as:
+      <a href="{{ url_for('user', user_id=session.user_id) }}">
+        {{ session.username }}
+      </a>
+    </p>
+    {% endif %}
+
+    <nav>
+      <a href="{{ url_for('index') }}">Home</a> |
+
+      {% if session.user_id %}
+        <a href="{{ url_for('logout') }}">Log out</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Log in</a> |
+        <a href="{{ url_for('register') }}">Create an account</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="info">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+
+</html>
