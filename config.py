@@ -9,7 +9,7 @@ class Config:
 
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPOnly = True
-    SESSION_COOKIE = SAMESITE = "Lax"
+    SESSION_COOKIE_SAMESITE = "Lax"
 
     # NOTE: max upload 32 MiB; unused still
     MAX_CONTENT_LENGTH = 32 * 1024 * 1024
