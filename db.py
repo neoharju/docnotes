@@ -3,12 +3,12 @@
 import sqlite3
 from typing import Any, cast
 
-from flask import g
+from flask import current_app, g
 
 
 def get_connection() -> sqlite3.Connection:
     """Return a configured SQLite connection"""
-    con = sqlite3.connect("database.db")
+    con = sqlite3.connect(current_app.config["DATABASE"])
     con.execute("PRAGMA foreign_keys = ON")
     con.row_factory = sqlite3.Row
     return con
