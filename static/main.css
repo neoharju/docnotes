@@ -5,6 +5,32 @@ body {
   background-color: #f5f5f5;
 }
 
+header {
+	width: 100%;
+}
+
 h1 {
   background-color: lightgray;
+  text-align: center;
+  font-family: "Fixedsys";
+}
+
+nav {
+	padding: 10px 20px;
+	background-color: lightblue;
+	text-align: left;
+}
+
+nav a {
+  margin-right: 20px;
+}
+
+.logout-form {
+	display: inline
+}
+
+main {
+	max-width: 50em;
+	margin: 30px auto;
+	padding: 0 20px;
 }

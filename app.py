@@ -1,21 +1,35 @@
 """Flask app entry point"""
 
-import os
 import secrets
 import sqlite3
+from io import BytesIO
+from os import environ
 
+import items
 import users
-from auth import authenticate_user, require_user_id, safe_redirect_url
+from auth import authenticate_user, check_csrf, require_user_id, safe_redirect_url
 from config import Config, DevConfig, TestConfig
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import (
+    Flask,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+)
 from flask.typing import ResponseReturnValue
+from uploads import UploadError, read_pdf
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 
-if os.environ.get("FLASK_ENV") == "test":
+if environ.get("FLASK_ENV") == "test":
     app.config.from_object(TestConfig)
-elif os.environ.get("FLASK_ENV") == "dev":
+elif environ.get("FLASK_ENV") == "dev":
     app.config.from_object(DevConfig)
 else:
     app.config.from_object(Config)
@@ -62,9 +76,10 @@ def login() -> ResponseReturnValue:
         next_page = safe_redirect_url(request.args.get("next", "/"))
         return render_template("login.html", next_page=next_page)
 
+    # POST
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "")
-    next_page = request.form.get("next_page", "/")
+    next_page = safe_redirect_url(request.form.get("next_page", "/"))
 
     user_id = authenticate_user(username, password)
     if user_id is None:
@@ -73,6 +88,7 @@ def login() -> ResponseReturnValue:
 
     session.clear()
     session["user_id"] = user_id
+    session["username"] = username
     session["csrf_token"] = secrets.token_hex(32)
 
     return redirect(next_page)
@@ -84,3 +100,148 @@ def logout() -> ResponseReturnValue:
     require_user_id()
     session.clear()
     return redirect("/")
+
+
+@app.route("/items")
+def item_list() -> ResponseReturnValue:
+    """Display all items or a searched item"""
+    keyword = request.args.get("search", "").strip()
+
+    if len(keyword) > 200:
+        abort(400, "Search query too long")
+
+    if keyword:
+        all_items = items.search_items(keyword)
+    else:
+        all_items = items.get_all_items()
+
+    return render_template("items/list.html", items=all_items, search=keyword)
+
+
+@app.route("/items/new", methods=["GET", "POST"])
+def item_new() -> ResponseReturnValue:
+    """User uploads a new PDF"""
+
+    user_id = require_user_id()
+
+    if request.method == "GET":
+        return render_template("items/new.html", filled={})
+
+    check_csrf()
+    title = request.form.get("title", "").strip()
+
+    if not 1 <= len(title) <= 100:
+        flash("Title must be between 1 and 100 characters")
+        return render_template("items/new.html", filled={"title": title})
+
+    uploaded_file = request.files.get("pdf")
+
+    if uploaded_file is None:
+        flash("No file was selected")
+        return render_template(
+            "items/new.html",
+            filled={"title": title},
+        )
+
+    try:
+        pdf_data = read_pdf(uploaded_file, current_app.config["MAX_CONTENT_LENGTH"])
+    except UploadError as error:
+        flash(str(error))
+        return render_template("items/new.html", filled={"title": title})
+
+    filename = secure_filename(uploaded_file.filename or "") or "doc.pdf"
+
+    item_id = items.create_item(user_id, title, filename, pdf_data)
+    return redirect(f"/items/{item_id}")
+
+
+@app.route("/items/<int:item_id>")
+def item_view(item_id: int) -> ResponseReturnValue:
+    """Show an item [user items are not private; they are r not w]"""
+    item = items.get_item(item_id)
+    if item is None:
+        abort(404)
+
+    return render_template("items/view.html", item=item)
+
+
+@app.route("/items/<int:item_id>/edit", methods=["GET", "POST"])
+def item_edit(item_id: int) -> ResponseReturnValue:
+    """User edit own PDF's title or replaces the it"""
+    user_id = require_user_id()
+    item = items.get_item(item_id)
+
+    if item is None:
+        abort(404)
+
+    if item["user_id"] != user_id:
+        abort(403)
+
+    if request.method == "GET":
+        return render_template("items/edit.html", item=item, filled={"title": item["title"]})
+
+    check_csrf()
+    title = request.form.get("title", "").strip()
+
+    if not 1 <= len(title) <= 100:
+        flash("Title must be betweeen 1 and 100 characters")
+        return render_template("items/edit.html", item=item, filled={"title": title})
+
+    replacement = request.files.get("pdf")
+    if replacement is not None and replacement.filename:
+        try:
+            pdf_data = read_pdf(replacement, current_app.config["MAX_CONTENT_LENGTH"])
+        except UploadError as error:
+            flash(str(error))
+            return render_template("items/edit.html", item=item, filled={"title": title})
+        filename = secure_filename(replacement.filename) or item["filename"]
+        items.edit_item(item_id, title, filename, pdf_data)
+    else:
+        items.edit_item(item_id, title)
+
+    return redirect(f"/items/{item_id}")
+
+
+@app.route("/items/<int:item_id>/delete", methods=["POST"])
+def item_delete(item_id: int) -> ResponseReturnValue:
+    """User deletes own item"""
+    user_id = require_user_id()
+    check_csrf()
+
+    item = items.get_item(item_id)
+
+    if item is None:
+        abort(404)
+
+    if item["user_id"] != user_id:
+        abort(403)
+
+    items.delete_item(item_id)
+    return redirect("/items")
+
+
+@app.route("/items/<int:item_id>/pdf")
+def item_pdf(item_id: int) -> ResponseReturnValue:
+    row = items.get_item_pdf(item_id)
+
+    if row is None:
+        abort(404)
+
+    return send_file(
+        BytesIO(row["pdf_data"]),
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=row["filename"],
+    )
+
+
+@app.route("/users/<int:user_id>")
+def user_profile(user_id: int) -> ResponseReturnValue:
+    """Public profile page with user's uploaded items"""
+    profile_user = users.get_user(user_id)
+
+    if profile_user is None:
+        abort(404)
+
+    user_items = items.get_all_user_items(user_id)
+    return render_template("users/profile.html", profile_user=profile_user, items=user_items)

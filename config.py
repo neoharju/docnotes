@@ -11,8 +11,8 @@ class Config:
     SESSION_COOKIE_HTTPOnly = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
-    # NOTE: max upload 32 MiB; unused still
-    MAX_CONTENT_LENGTH = 32 * 1024 * 1024
+    # NOTE: max upload 42 MiB
+    MAX_CONTENT_LENGTH = 42 * 1024 * 1024
 
 
 class DevConfig(Config):

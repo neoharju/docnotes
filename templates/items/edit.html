@@ -1,0 +1,23 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Edit item{% endblock %}
+
+{% block content %}
+<h2>Edit item</h2>
+
+<form action="{{ url_for('item_edit', item_id=item.id) }}" method="post" enctype="multipart/form-data">
+	<p>
+		<label for="title">Title:</label><br />
+		<input type="text" id="title" name="title" value="{{ filled.title }}" maxlength="100" required />
+	</p>
+	<p>
+		<label for="pdf">Replace PDF file (optional, max 10 MB):</label><br />
+		<input type="file" id="pdf" name="pdf" accept="application/pdf" />
+		<br />
+		<small>Current file: {{ item.filename }}. Leave empty to keep it.</small>
+	</p>
+	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+	<button type="submit">Save changes</button>
+</form>
+{% endblock %}

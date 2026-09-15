@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}Docs{% endblock %}
+
+{% block content %}
+<h2>Shared PDFs</h2>
+
+<form action="{{ url_for('item_list') }}" method="get">
+	<input type="text" name="search" value="{{ search }}" placeholder="Search by
+				 title, filename or uploader..." />
+	<button type="submit">Search</button>
+	{% if search %}
+		<a href="{{ url_for('item_list') }}">Clear</a>
+	{% endif %}
+</form>
+
+{% if session.user_id %}
+	<p><a href="{{ url_for('item_new') }}">Upload a PDF</a></p>
+{% endif %}
+
+{% if items %}
+	{% for item in items %}
+		<a href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>
+		<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{
+			item.username }}</a>, {{ item.created_at }}
+	{% endfor %}
+{% else %}
+	<p>No items founds</p>
+{% endif %}
+{% endblock %}

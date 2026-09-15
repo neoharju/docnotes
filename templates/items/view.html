@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ item.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ item.title }}</h2>
+<p>
+	Uploaded by <a href"{{ url_for('user_profile', user_id=item.user_id) }}">
+		{{item.username }} </a> on {{ item.created_at }}
+</p>
+<p>
+ <a href="{{ url_for('item_pdf', item_id=item.id) }}" target="_blank"
+													  rel="noopener">
+	 Open {{ item.filename }} in a new tab
+ </a>
+</p>
+{% if session.user_id == item.user_id %}
+	<p>
+		<a href="{{ url_for('item_edit', item_id=item.id) }}">Edit</a>
+
+		<form action="{{ url_for('item_delete', item_id=item.id) }}"
+					  method="post"
+					  style="display: inline"
+					  onsubmit="return confirm('Delete this item
+					  permanently?')">
+			<input type="hidden" name="csrf_token" value="{{ session.csrf_token
+						 }}" />
+			<button type="submit">Delete</button>
+		</form>
+	</p>
+{% endif %}
+
+<p><a href="{{ url_for('item_list') }}">Back to items</a></p>
+{% endblock %}
+
