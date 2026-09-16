@@ -1,4 +1,7 @@
+
 /* Blue color codes from: https://www.schemecolor.com/css-family-blue.php */
+
+
 body {
   margin: auto;
   max-width: 50em;
@@ -14,33 +17,53 @@ header {
 }
 
 h1 {
-  text-align: left;
+  text-align: right;
   font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+  font-size: small;
   color: #0F5298;
   /* imperial blue */
-  background: #D5F3FE;
+  /* background: #D5F3FE; */
   background: radial-gradient(circle,
-      rgba(102, 211, 250, 1) 0%,
-      rgba(102, 211, 250, 1) 5%,
-      rgba(213, 243, 254, 1) 100%);
-  padding: 10px 20px 10px 20px;
+      #3C99DC 0%,
+      #66D3FA 50%,
+      #D5F3FE 100%);
+
+  background-size: 200% 200%;
+  background-position: 50% 50%;
+
+  padding: 90px 10px 0px 0px;
   border-left-style: solid;
   border-bottom-style: solid;
+  border-width: medium;
   border-radius: 10px 10px 10px 10px;
+  animation: hone_gradient 15s ease infinite;
+}
+
+@keyframes hone_gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 h2 {
   background: #3C99DC;
-  background: linear-gradient(60deg,
-      rgba(60, 153, 220, 1) 0%,
-      rgba(102, 211, 250, 1) 20%,
-      rgba(213, 243, 254, 1) 100%);
+  background: radial-gradient(farthest-corner at 50% 100%,
+      #66D3FA 0%,
+      #D5F3FE 50%);
 
   text-align: center;
   font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
-  color: black;
-  border-radius: 5px 5px 5px 5px;
-  padding: 8px 8px 8px 8px
+  color: #0F5290;
+  border-bottom-style: solid;
+  border-width: thin;
+  border-radius: 10px 10px 10px 10px;
+  padding: 60px 8px 8px 8px
 }
 
 p {
@@ -63,4 +86,47 @@ main {
   max-width: 50em;
   margin: 30px auto;
   padding: 0 20px;
+}
+
+nav a,
+nav .link-button {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 2px 5px;
+
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+
+  color: #0F5298;
+  background: transparent;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  border-radius: 4px;
+
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+}
+
+nav a:hover,
+nav .link-button:hover {
+  color: #0F5298;
+  background-color: #D5F3FE;
+}
+
+nav a:active,
+nav .link-button:active {
+  color: #0F5290;
+  background-color: #66D3FA;
+}
+
+nav a:focus-visible,
+nav .link-button:focus-visible {
+  outline: 2px solid #3C99DC;
+  outline-offset: 2px;
 }
