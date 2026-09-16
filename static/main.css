@@ -1,36 +1,66 @@
+/* Blue color codes from: https://www.schemecolor.com/css-family-blue.php */
 body {
   margin: auto;
   max-width: 50em;
-  font-family: sans-serif;
-  background-color: #f5f5f5;
+  font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+  background-color: #D5F3FE;
+  /* Pastel aqua */
+  color: #3C99DC;
+  /* Rich light blue */
 }
 
 header {
-	width: 100%;
+  width: 100%;
 }
 
 h1 {
-  background-color: lightgray;
+  text-align: left;
+  font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+  color: #0F5298;
+  /* imperial blue */
+  background: #D5F3FE;
+  background: radial-gradient(circle,
+      rgba(102, 211, 250, 1) 0%,
+      rgba(102, 211, 250, 1) 5%,
+      rgba(213, 243, 254, 1) 100%);
+  padding: 10px 20px 10px 20px;
+  border-left-style: solid;
+  border-bottom-style: solid;
+  border-radius: 10px 10px 10px 10px;
+}
+
+h2 {
+  background: #3C99DC;
+  background: linear-gradient(60deg,
+      rgba(60, 153, 220, 1) 0%,
+      rgba(102, 211, 250, 1) 20%,
+      rgba(213, 243, 254, 1) 100%);
+
   text-align: center;
-  font-family: "Fixedsys";
+  font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+  color: black;
+  border-radius: 5px 5px 5px 5px;
+  padding: 8px 8px 8px 8px
+}
+
+p {
+  color: black;
 }
 
 nav {
-	padding: 10px 20px;
-	background-color: lightblue;
-	text-align: left;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.25em 0.75em;
+  padding: 10px 20px;
+  background-color: lightblue;
+  border-radius: 5px 5px 5px 5px;
 }
 
-nav a {
-  margin-right: 20px;
-}
-
-.logout-form {
-	display: inline
-}
 
 main {
-	max-width: 50em;
-	margin: 30px auto;
-	padding: 0 20px;
+  max-width: 50em;
+  margin: 30px auto;
+  padding: 0 20px;
 }
