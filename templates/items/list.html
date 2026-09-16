@@ -23,6 +23,7 @@
 		<a href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>
 		<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{
 			item.username }}</a>, {{ item.created_at }}
+		<br />
 	{% endfor %}
 {% else %}
 	<p>No items founds</p>
