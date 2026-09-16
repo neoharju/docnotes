@@ -13,26 +13,25 @@
 <body>
   <header>
     <h1>DocNotes</h1>
-
-    {% if session.user_id %}
-    <p>
-      Logged in as: {{ session.username }}
-    </p>
-    {% endif %}
-
     <nav>
       <a href="{{ url_for('index') }}">Home</a> |
       <a href="{{ url_for('item_list') }}">Docs</a> |
 
       {% if session.user_id %}
       <form action="{{ url_for('logout') }}" method="post" style="display:inline">
-        <input type="hidden" name="csrf_token" value="{{ session.csrf_token
-					   }}" />
-      </form>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+		<button type="submit" class="link-button">Log out</button> 
+      </form> |
       {% else %}
       <a href="{{ url_for('login') }}">Log in</a> |
       <a href="{{ url_for('register') }}">Create an account</a>
       {% endif %}
+
+    {% if session.user_id %}
+	<a href="{{ url_for('user_profile', user_id=session.user_id) }}">   {{
+		session.username }}</a>
+    {% endif %}
+
     </nav>
   </header>
 
