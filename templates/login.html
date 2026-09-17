@@ -7,17 +7,17 @@
 <h2>Log in</h2>
 <form class="auth-form" action="{{ url_for('login') }}" method="post">
 	<p>
-		<label for="username">username</label><br />
-		<input type="text" id="username" name="username" autocomplete="username" required />
+		<label for="username"></label>
+		<input type="text" placeholder="username" id="username" name="username" autocomplete="username" required />
 	</p>
 	<p>
-		<label for="password">password</label><br />
-		<input type="password" id="password" name="password" autocomplete="current-password" required />
+		<label for="password"></label>
+		<input type="password" placeholder="password" id="password" name="password" autocomplete="current-password" required />
 	</p>
 	<input type="hidden" name="next_page" value="{{ next_page | default('/') }}" />
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
 
-	<button type="submit">Log in</button>
+	<button type="submit">log in</button>
 </form>
 <a href="{{ url_for('register') }}">Create an account</a>
 
