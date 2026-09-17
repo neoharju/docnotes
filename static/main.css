@@ -1,155 +1,242 @@
 
 /* Blue color codes from: https://www.schemecolor.com/css-family-blue.php */
+/*
+#3C99DC 
+#66D3FA 
+#D5F3FE 
+ */
 
 
 body {
-  margin: auto;
-  max-width: 50em;
-  font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
-  background-color: #D5F3FE;
-  /* Pastel aqua */
-  color: #3C99DC;
-  /* Rich light blue */
+	margin: auto;
+	max-width: 50em;
+	font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+	background-color: #D5F3FE;
+	/* Pastel aqua */
+	color: #3C99DC;
+	/* Rich light blue */
 }
 
 header {
-  width: 100%;
+	width: 100%;
 }
 
 h1 {
-  text-align: right;
-  font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
-  font-size: small;
-  color: #0F5298;
-  /* imperial blue */
-  /* background: #D5F3FE; */
-  background: radial-gradient(circle,
-      #3C99DC 0%,
-      #66D3FA 50%,
-      #D5F3FE 100%);
+	text-align: right;
+	font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+	font-size: small;
+	color: #0F5298;
+	/* imperial blue */
+	/* background: #D5F3FE; */
+	background: radial-gradient(circle,
+	#3C99DC 0%,
+	#66D3FA 50%,
+	#D5F3FE 100%);
 
-  background-size: 200% 200%;
-  background-position: 50% 50%;
+	background-size: 200% 200%;
+	background-position: 50% 50%;
 
-  padding: 90px 10px 0px 0px;
-  border-left-style: solid;
-  border-bottom-style: solid;
-  border-width: medium;
-  border-radius: 10px 10px 10px 10px;
-  animation: hone_gradient 15s ease infinite;
+	padding: 90px 10px 0px 0px;
+	border-left-style: solid;
+	border-bottom-style: solid;
+	border-width: medium;
+	border-radius: 10px 10px 10px 10px;
+	animation: hone_gradient 15s ease infinite;
 }
 
 @keyframes hone_gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
 }
 
 h2 {
-  background: #3C99DC;
-  background: radial-gradient(farthest-corner at 50% 100%,
-      #66D3FA 0%,
-      #D5F3FE 50%);
+	background: #3C99DC;
+	background: radial-gradient(farthest-corner at 50% 100%,
+	#66D3FA 0%,
+	#D5F3FE 50%);
 
-  text-align: center;
-  font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
-  color: #0F5290;
-  border-bottom-style: solid;
-  border-width: thin;
-  border-radius: 10px 10px 10px 10px;
-  padding: 60px 8px 8px 8px
+	text-align: center;
+	font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+	color: #0F5290;
+	border-bottom-style: solid;
+	border-width: thin;
+	border-radius: 10px 10px 10px 10px;
+	padding: 60px 8px 8px 8px;
 }
 
 p {
-  color: black;
+	color: black;
 }
 
 nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: 0.25em 0.75em;
-  padding: 10px 20px;
-  background-color: lightblue;
-  border-radius: 5px 5px 5px 5px;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: baseline;
+	gap: 0.25em 0.75em;
+	padding: 10px 20px;
+	background-color: lightblue;
+	border-radius: 5px 5px 5px 5px;
 }
 
 
 main {
-  max-width: 50em;
-  margin: 30px auto;
-  text-align: center;
-  padding: 0 20px;
+	max-width: 50em;
+	margin: 30px auto;
+	text-align: center;
+	padding: 0 20px;
 }
 
 nav a,
 nav .link-button {
-  appearance: none;
-  border: 0;
-  margin: 0;
-  padding: 2px 5px;
+	appearance: none;
+	border: 0;
+	margin: 0;
+	padding: 2px 5px;
 
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  font-weight: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	font-weight: inherit;
 
-  color: #0F5298;
-  background: transparent;
+	color: #0F5298;
+	background: transparent;
 
-  text-decoration: none;
-  cursor: pointer;
+	text-decoration: none;
+	cursor: pointer;
 
-  border-radius: 4px;
+	border-radius: 4px;
 
-  transition:
-    color 0.15s ease,
-    background-color 0.15s ease,
+	transition:
+	color 0.15s ease,
+	background-color 0.15s ease,
 }
 
 nav a:hover,
 nav .link-button:hover {
-  color: #0F5298;
-  background-color: #D5F3FE;
+	color: #0F5298;
+	background-color: #D5F3FE;
 }
 
 nav a:active,
 nav .link-button:active {
-  color: #0F5290;
-  background-color: #66D3FA;
+	color: #0F5290;
+	background-color: #66D3FA;
 }
 
 nav a:focus-visible,
 nav .link-button:focus-visible {
-  outline: 2px solid #3C99DC;
-  outline-offset: 2px;
+	outline: 2px solid #3C99DC;
+	outline-offset: 2px;
 }
 
 .auth-form {
-  max-width: 200px;
-  margin: 0 auto;
-  padding: 10px 20px;
-  border-radius: 5px 5px 5px 5px;
+	max-width: 200px;
+	margin: 0 auto;
+	padding: 10px 20px;
+	border-radius: 5px 5px 5px 5px;
 }
 
 .auth-form p {
-  text-align: center;
+	text-align: center;
 }
 
 .auth-form input[type="text"],
 .auth-form input[type="password"] {
-  border-radius: 10px;
-  width: 100%;
-  padding: 8px 12px;
-  box-sizing: border-box;
-  text-align: center;
-  font-size: medium;
-  font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+	border-radius: 10px;
+	border-style: solid;
+	width: 100%;
+	padding: 8px 12px;
+	box-sizing: border-box;
+	text-align: center;
+	font-size: medium;
+	font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
+	opacity: 0.7;
 }
+
+.auth-form input:focus {
+	outline: 1px solid #3C99DC;
+	background: white;
+	opacity: 1;
+}
+
+.auth-form input:valid {
+	opacity: 1;
+}
+
+.auth-form button {
+	font-family: inherit;
+	font-size: inherit;
+	padding: 8px 50px;
+	border-radius: 10px;
+}
+.auth-form button:hover {
+	background-color: #66D3FA;
+}
+.auth-form button:active {
+	background-color: #D5F3FE;
+}
+
+/* display item and edit and delete button grid */
+.item-actions {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	margin: 10px 0;
+}
+
+.item-file {
+	grid-column: 2;
+	white-space: nowrap;
+}
+
+.item-buttons {
+	grid-column: 3;
+	justify-self: end;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.item-buttons form {
+	margin: 0;
+}
+
+.edit-button,
+.delete-button {
+	padding: 4px 14px;
+	border-radius: 6px;
+	box-sizing: border-box;
+	font: inherit;
+	font-size: medium;
+	text-decoration: none;
+}
+
+.edit-button {
+	background: #3c99dc;
+	color: white;
+	border: 1px solid #3c99dc;
+}
+
+.edit-button:hover {
+	background: #287fc0;
+}
+
+.delete-button {
+	background: transparent;
+	color: #c0392b;
+	border: 1px solid #C0392B;
+}
+
+.delete-button:hover {
+	background: #C0392B;
+	color: white;
+}
+
