@@ -8,7 +8,7 @@
 <h3>Uploaded items</h3>
 
 {% if items %}
-	<ul>
+	<ul style="list-style-type: none;">
 		{% for item in items %}
 			<li>
 				<a href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>, {{ item.created_at }}

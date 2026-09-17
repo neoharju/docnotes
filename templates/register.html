@@ -4,7 +4,7 @@
 
 {% block content %}
 <h2>Create an account</h2>
-<form action="{{ url_for('register') }}" method="post">
+<form class="auth-form" action="{{ url_for('register') }}" method="post">
 	<p>
 		<label for="username">Username:</label><br />
 		<input type="text" id="username" name="username" value="{{ filled.username }}" maxlength="20" minlength="2"
