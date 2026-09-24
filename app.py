@@ -35,6 +35,15 @@ else:
     app.config.from_object(Config)
 
 
+@app.context_processor
+def form_limits() -> dict[str, int | str]:
+    return {
+        "max_content_length": app.config["MAX_CONTENT_LENGTH"],
+        "min_password_length": app.config["MIN_PASSWORD_LENGTH"],
+        "max_password_length": app.config["MAX_PASSWORD_LENGTH"],
+    }
+
+
 @app.route("/")
 def index() -> str:
     """Render the home page"""
@@ -53,6 +62,14 @@ def register() -> ResponseReturnValue:
 
     if not 2 <= len(username) <= 20:
         flash("Username should be between 2 and 20 characters")
+        return render_template("register.html", filled={"username": username})
+
+    if (
+        not app.config["MIN_PASSWORD_LENGTH"]
+        <= len(password_1)
+        <= app.config["MAX_PASSWORD_LENGTH"]
+    ):
+        flash(f"Password must be at least {app.config['MIN_PASSWORD_LENGTH']} characters")
         return render_template("register.html", filled={"username": username})
 
     if password_1 != password_2:
@@ -98,6 +115,7 @@ def login() -> ResponseReturnValue:
 def logout() -> ResponseReturnValue:
     """Log out the current user"""
     require_user_id()
+    check_csrf()
     session.clear()
     return redirect("/")
 

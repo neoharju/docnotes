@@ -7,16 +7,20 @@
 <form class="auth-form" action="{{ url_for('register') }}" method="post">
 	<p>
 		<label for="username"></label>
-		<input type="text" placeholder="username" id="username" name="username" value="{{ filled.username }}" maxlength="20" minlength="2"
-			autocomplete="username" required />
+		<input type="text" placeholder="username" id="username" name="username" value="{{ filled.username }}"
+			maxlength="20" minlength="2" autocomplete="username" required />
 	</p>
 	<p>
 		<label for="password_1"></label>
-		<input type="password" placeholder="password" id="password_1" name="password_1" autocomplete="new-password" required />
+		<input type="password" placeholder="password" id="password_1" name="password_1"
+			maxlength="{{ max_password_length }}" minlength="{{ min_password_length }}" autocomplete="new-password"
+			required />
 	</p>
 	<p>
 		<label for="password_2"></label>
-		<input type="password" placeholder="password again" id="password_2" name="password_2" autocomplete="new-password" required />
+		<input type="password" placeholder="password again" id="password_2" name="password_2"
+			maxlength="{{ max_password_length }}" minlength="{{ min_password_length }}" autocomplete="new-password"
+			required />
 	</p>
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 	<button type="submit">create</button>
