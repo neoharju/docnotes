@@ -1,6 +1,7 @@
 """SQLite database helpers"""
 
 import sqlite3
+from contextlib import closing
 from typing import Any, cast
 
 from flask import current_app, g
@@ -19,11 +20,10 @@ def execute(sql: str, params: list[Any] | None = None) -> None:
     if params is None:
         params = []
 
-    con = get_connection()
-    result = con.execute(sql, params)
-    con.commit()
+    with closing(get_connection()) as con, con:
+        result = con.execute(sql, params)
+
     g.last_insert_id = result.lastrowid
-    con.close()
 
 
 def last_insert_id() -> int | None:
@@ -39,7 +39,5 @@ def query(
     if params is None:
         params = []
 
-    con = get_connection()
-    result = con.execute(sql, params).fetchall()
-    con.close()
-    return result
+    with closing(get_connection()) as con:
+        return con.execute(sql, params).fetchall()
