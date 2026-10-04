@@ -1,0 +1,24 @@
+{% macro items_table(items, show_uploader=true) %}
+<div class="table-wrap">
+	<table class="items-table">
+		<tr>
+			<th>Title</th>
+			{% if show_uploader %}<th>Uploaded by</th>{% endif %}
+			<th>Uploaded</th>
+		</tr>
+		{% for item in items %}
+		<tr>
+			<td>
+				<a href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>
+			</td>
+			{% if show_uploader %}
+			<td>
+				<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{ item.username }}</a>
+			</td>
+			{% endif %}
+			<td class="date">{{ item.created_at }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endmacro %}

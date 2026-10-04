@@ -1,16 +1,17 @@
 {% extends "layout.html" %}
+{% from "items/table.html" import items_table %}
 
 {% block title %}Docs{% endblock %}
 
 {% block content %}
 <h2>Shared PDFs</h2>
 
-<form action="{{ url_for('item_list') }}" method="get">
+<form class="search-form" action="{{ url_for('item_list') }}" method="get">
 	<input type="text" name="search" value="{{ search }}" maxlength="200" 
 				 placeholder="Search by title, filename or uploader..." />
 	<button type="submit">Search</button>
 	{% if search %}
-		<a href="{{ url_for('item_list') }}">Clear</a>
+		<a class="button" href="{{ url_for('item_list') }}">Clear</a>
 	{% endif %}
 </form>
 
@@ -19,13 +20,8 @@
 {% endif %}
 
 {% if items %}
-	{% for item in items %}
-		<a href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>
-		<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{
-			item.username }}</a>, {{ item.created_at }}
-		<br />
-	{% endfor %}
+	{{ items_table(items) }}
 {% else %}
-	<p>No items founds</p>
+	<p>No items found</p>
 {% endif %}
 {% endblock %}

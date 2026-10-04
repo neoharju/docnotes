@@ -24,7 +24,7 @@ header {
 h1 {
 	text-align: right;
 	font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
-	font-size: small;
+	font-size: 1rem;
 	color: #0F5298;
 	/* imperial blue */
 	/* background: #D5F3FE; */
@@ -36,7 +36,7 @@ h1 {
 	background-size: 200% 200%;
 	background-position: 50% 50%;
 
-	padding: 90px 10px 0px 0px;
+	padding: 40px 20px 5px 0px;
 	border-left-style: solid;
 	border-bottom-style: solid;
 	border-width: medium;
@@ -68,7 +68,7 @@ h2 {
 	border-bottom-style: solid;
 	border-width: thin;
 	border-radius: 10px 10px 10px 10px;
-	padding: 60px 8px 8px 8px;
+	padding: 20px 8px 8px 8px;
 }
 
 p {
@@ -116,7 +116,7 @@ nav .link-button {
 
 	transition:
 	color 0.15s ease,
-	background-color 0.15s ease,
+	background-color 0.15s ease;
 }
 
 nav a:hover,
@@ -138,7 +138,7 @@ nav .link-button:focus-visible {
 }
 
 .auth-form {
-	max-width: 200px;
+	max-width: 20rem;
 	margin: 0 auto;
 	padding: 10px 20px;
 	border-radius: 5px 5px 5px 5px;
@@ -156,7 +156,7 @@ nav .link-button:focus-visible {
 	padding: 8px 12px;
 	box-sizing: border-box;
 	text-align: center;
-	font-size: medium;
+	font-size: 1rem;
 	font-family: "Fixedsys Excelsior", ui-monospace, Consolas, monospace;
 	opacity: 0.7;
 }
@@ -211,11 +211,11 @@ nav .link-button:focus-visible {
 
 .edit-button,
 .delete-button {
-	padding: 4px 14px;
-	border-radius: 6px;
+	padding: 10px 20px;
+	border-radius: 10px;
 	box-sizing: border-box;
 	font: inherit;
-	font-size: medium;
+	font-size: 1rem;
 	text-decoration: none;
 }
 
@@ -247,4 +247,69 @@ nav .link-button:focus-visible {
 	border-left-width: 8px;
 	border-radius: 10px;
 	text-align: left;
+}
+
+button,
+.button {
+	display: inline-block;
+	padding: 10px 20px;
+	font-size: 1rem;
+	font-weight: bold;
+	color: #0f5298;
+	border: 2px solid #3c99dc;
+	border-radius: 10px;
+}
+button:hover,
+.button:hover {
+	background: #66d3fa;
+}
+
+input[type="text"],
+input[type="password"] {
+	box-sizing: border-box;
+	padding: 8px 12px;
+	font-size: 1rem;
+	border: 2px solid #3c99dc;
+	border-radius: 10px;
+}
+
+#title {
+	width: 30em;
+}
+
+input[type="file"] {
+	font-size: 1rem;
+}
+input[type="file"]::file-selector-button {
+	padding: 8px 14px;
+	color: #0f5298;
+	border: 2px solid #3c99dc;
+	border-radius: 10px;
+}
+
+.search-form {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+
+.search-form input {
+	flex: 1;
+	max-width: 30em;
+	min-width: 0;
+}
+
+.table-wrap {
+	overflow-x: auto;
+}
+.items-table th {
+	color: white;
+	background: #0f5298;
+}
+.items-table tr:nth-child(odd) td {
+	background: #eef9fe;
+}
+
+.items-table .date {
+	white-space: nowrap;
 }
