@@ -334,3 +334,9 @@ input[type="file"]::file-selector-button {
 .items-table .date {
 	white-space: nowrap;
 }
+
+.logo {
+	width: 100%;
+	max-width: 600px;
+	height: auto;
+}
