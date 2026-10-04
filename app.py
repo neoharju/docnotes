@@ -41,7 +41,12 @@ def form_limits() -> dict[str, int | str]:
         "max_content_length": app.config["MAX_CONTENT_LENGTH"],
         "min_password_length": app.config["MIN_PASSWORD_LENGTH"],
         "max_password_length": app.config["MAX_PASSWORD_LENGTH"],
+        "min_username_length": app.config["MIN_USERNAME_LENGTH"],
+        "max_username_length": app.config["MAX_USERNAME_LENGTH"],
     }
+
+
+_lim = form_limits()
 
 
 @app.route("/")
@@ -60,16 +65,12 @@ def register() -> ResponseReturnValue:
     password_1 = request.form.get("password_1", "")
     password_2 = request.form.get("password_2", "")
 
-    if not 2 <= len(username) <= 20:
+    if not _lim["min_username_length"] <= len(username) <= _lim["max_username_length"]:
         flash("Username should be between 2 and 20 characters")
         return render_template("register.html", filled={"username": username})
 
-    if (
-        not app.config["MIN_PASSWORD_LENGTH"]
-        <= len(password_1)
-        <= app.config["MAX_PASSWORD_LENGTH"]
-    ):
-        flash(f"Password must be at least {app.config['MIN_PASSWORD_LENGTH']} characters")
+    if not _lim["min_password_length"] <= len(password_1) <= _lim["max_password_length"]:
+        flash(f"Password must be at least {_lim['min_password_length']} characters")
         return render_template("register.html", filled={"username": username})
 
     if password_1 != password_2:
@@ -91,17 +92,20 @@ def login() -> ResponseReturnValue:
     """Authenticate user and create session"""
     if request.method == "GET":
         next_page = safe_redirect_url(request.args.get("next", "/"))
-        return render_template("login.html", next_page=next_page)
+        return render_template("login.html", next_page=next_page, filled={})
 
     # POST
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "")
     next_page = safe_redirect_url(request.form.get("next_page", "/"))
 
-    user_id = authenticate_user(username, password)
+    check_length = (
+        len(username) > _lim["max_username_length"] or len(password) > _lim["max_password_length"]
+    )
+    user_id = None if check_length else authenticate_user(username, password)
     if user_id is None:
         flash("Wrong username or password")
-        return render_template("login.html", next_page=next_page)
+        return render_template("login.html", next_page=next_page, filled={"username": username})
 
     session.clear()
     session["user_id"] = user_id
@@ -162,7 +166,7 @@ def item_new() -> ResponseReturnValue:
         )
 
     try:
-        pdf_data = read_pdf(uploaded_file, current_app.config["MAX_CONTENT_LENGTH"])
+        pdf_data = read_pdf(uploaded_file, current_app.config["MAX_PDF_SIZE"])
     except UploadError as error:
         flash(str(error))
         return render_template("items/new.html", filled={"title": title})
@@ -202,13 +206,13 @@ def item_edit(item_id: int) -> ResponseReturnValue:
     title = request.form.get("title", "").strip()
 
     if not 1 <= len(title) <= 100:
-        flash("Title must be betweeen 1 and 100 characters")
+        flash("Title must be between 1 and 100 characters")
         return render_template("items/edit.html", item=item, filled={"title": title})
 
     replacement = request.files.get("pdf")
     if replacement is not None and replacement.filename:
         try:
-            pdf_data = read_pdf(replacement, current_app.config["MAX_CONTENT_LENGTH"])
+            pdf_data = read_pdf(replacement, current_app.config["MAX_PDF_SIZE"])
         except UploadError as error:
             flash(str(error))
             return render_template("items/edit.html", item=item, filled={"title": title})

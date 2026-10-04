@@ -2,6 +2,8 @@
 
 from werkzeug.datastructures import FileStorage
 
+_MAX_FILENAME_LENGTH = 255
+
 
 class UploadError(ValueError):
     """Failed upload validation"""
@@ -13,8 +15,11 @@ def read_pdf(file: FileStorage | None, max_bytes: int) -> bytes:
     MAX_PDF_BYTES = max_bytes
     PDF_MAGIC = b"%PDF-"
 
-    if file is None or file.filename == "":
+    if file is None or not file.filename:
         raise UploadError("No file was selected")
+
+    if len(file.filename) > _MAX_FILENAME_LENGTH:
+        raise UploadError("File name must be max {MAX_FILENAME_LENGTH} characters")
 
     data: bytes = file.read(MAX_PDF_BYTES + 1)
     # NOTE: File exists already, would be better to validate beforehand

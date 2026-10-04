@@ -239,4 +239,12 @@ nav .link-button:focus-visible {
 	background: #C0392B;
 	color: white;
 }
-
+.info {
+	margin: 0 0 15px;
+	padding: 10px 15px;
+	color: black;
+	border: 2px solid #3c99dc;
+	border-left-width: 8px;
+	border-radius: 10px;
+	text-align: left;
+}

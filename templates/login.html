@@ -8,11 +8,24 @@
 <form class="auth-form" action="{{ url_for('login') }}" method="post">
 	<p>
 		<label for="username"></label>
-		<input type="text" placeholder="username" id="username" name="username" autocomplete="username" required />
+		<input type="text"
+		  placeholder="username"
+		  id="username"
+		  name="username"
+		  value="{{ filled.username }}"
+          maxlength="{{ max_username_length }}"
+          minlength="{{ min_username_length }}"
+		  autocomplete="username" required />
 	</p>
 	<p>
 		<label for="password"></label>
-		<input type="password" placeholder="password" id="password" name="password" autocomplete="current-password" required />
+		<input type="password"
+		  placeholder="password"
+		  id="password"
+		  name="password"
+		  maxlength="{{ max_password_length }}" 
+          minlength="{{ min_password_length }}" 
+		  autocomplete="current-password" required />
 	</p>
 	<input type="hidden" name="next_page" value="{{ next_page | default('/') }}" />
 	<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />

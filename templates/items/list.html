@@ -6,8 +6,8 @@
 <h2>Shared PDFs</h2>
 
 <form action="{{ url_for('item_list') }}" method="get">
-	<input type="text" name="search" value="{{ search }}" placeholder="Search by
-				 title, filename or uploader..." />
+	<input type="text" name="search" value="{{ search }}" maxlength="200" 
+				 placeholder="Search by title, filename or uploader..." />
 	<button type="submit">Search</button>
 	{% if search %}
 		<a href="{{ url_for('item_list') }}">Clear</a>
