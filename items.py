@@ -5,8 +5,8 @@ import sqlite3
 import db
 
 _METADATA_COLS = """
-    items.id, items.title, items.filename, items.created_at, items.user_id,
-    users.username
+    items.id, items.title, items.filename, datetime(items.created_at,
+    'localtime') AS created_at, items.user_id, users.username
 """
 
 
