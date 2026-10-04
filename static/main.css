@@ -308,13 +308,14 @@ input[type="file"]::file-selector-button {
 
 .table-wrap {
 	overflow-x: auto;
+	border: 2px solid #3c99dc;
+	border-radius: 10px;
 }
 .items-table {
     width: 100%;
 	border-collapse: collapse;
 	text-align: left;
 	color: black;
-	border: 2px solid #3c99dc;
 }
 .items-table th,
 .items-table td {
