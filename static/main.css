@@ -5,7 +5,9 @@
 #66D3FA 
 #D5F3FE 
  */
-
+html {
+	font-size: 112.5%
+}
 
 body {
 	margin: auto;
@@ -258,6 +260,8 @@ button,
 	color: #0f5298;
 	border: 2px solid #3c99dc;
 	border-radius: 10px;
+	text-decoration: none;
+	cursor: pointer;
 }
 button:hover,
 .button:hover {
@@ -267,6 +271,7 @@ button:hover,
 input[type="text"],
 input[type="password"] {
 	box-sizing: border-box;
+	max-width: 100%;
 	padding: 8px 12px;
 	font-size: 1rem;
 	border: 2px solid #3c99dc;
@@ -278,6 +283,7 @@ input[type="password"] {
 }
 
 input[type="file"] {
+	max-width: 100%;
 	font-size: 1rem;
 }
 input[type="file"]::file-selector-button {
@@ -285,6 +291,7 @@ input[type="file"]::file-selector-button {
 	color: #0f5298;
 	border: 2px solid #3c99dc;
 	border-radius: 10px;
+	cursor: pointer;
 }
 
 .search-form {
@@ -302,6 +309,19 @@ input[type="file"]::file-selector-button {
 .table-wrap {
 	overflow-x: auto;
 }
+.items-table {
+    width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	color: black;
+	border: 2px solid #3c99dc;
+}
+.items-table th,
+.items-table td {
+	padding: 10px 14px;
+	vertical-aligh: top;
+}
+
 .items-table th {
 	color: white;
 	background: #0f5298;
