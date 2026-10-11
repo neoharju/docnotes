@@ -5,6 +5,7 @@ import sqlite3
 from io import BytesIO
 from os import environ
 
+import comments
 import items
 import users
 from auth import authenticate_user, check_csrf, require_user_id, safe_redirect_url
@@ -179,12 +180,13 @@ def item_new() -> ResponseReturnValue:
 
 @app.route("/items/<int:item_id>")
 def item_view(item_id: int) -> ResponseReturnValue:
-    """Show an item [user items are not private; they are r not w]"""
+    """Show an item and its comments [user items are not private]"""
     item = items.get_item(item_id)
     if item is None:
         abort(404)
 
-    return render_template("items/view.html", item=item)
+    item_comments = comments.get_comments(item_id)
+    return render_template("items/view.html", item=item, comments=item_comments)
 
 
 @app.route("/items/<int:item_id>/edit", methods=["GET", "POST"])
@@ -267,3 +269,38 @@ def user_profile(user_id: int) -> ResponseReturnValue:
 
     user_items = items.get_all_user_items(user_id)
     return render_template("users/profile.html", profile_user=profile_user, items=user_items)
+
+
+@app.route("/items/<int:item_id>/comments", methods=["POST"])
+def comment_new(item_id: int) -> ResponseReturnValue:
+    """Add a comment to an item. Requires login."""
+    user_id = require_user_id()
+    check_csrf()
+
+    if items.get_item(item_id) is None:
+        abort(404)
+
+    content = request.form.get("content", "").strip()
+    if not 1 <= len(content) <= 2000:
+        flash("Comment must be between 1 and 2000 characters")
+        return redirect(f"/items/{item_id}")
+
+    comments.create_comment(item_id, user_id, content)
+    return redirect(f"/items/{item_id}")
+
+
+@app.route("/comments/<int:comment_id>/delete", methods=["POST"])
+def comment_delete(comment_id: int) -> ResponseReturnValue:
+    """Delete a comment. Only the comment's author may delete it."""
+    user_id = require_user_id()
+    check_csrf()
+
+    comment = comments.get_comment(comment_id)
+    if comment is None:
+        abort(404)
+
+    if comment["user_id"] != user_id:
+        abort(403)
+
+    comments.delete_comment(comment_id)
+    return redirect(f"/items/{comment['item_id']}")
