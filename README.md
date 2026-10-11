@@ -2,13 +2,6 @@
 
 Read and review research papers together!
 
-## Current features
-- User can create an account, login and logout
-- User can upload pdfs and view other user pdfs
-- User who owns the pdf can edit the title and delete it
-- User can search for pdfs based on name, title or by user who uploaded them
-- User can open pdf in new tab
-- Users can add comments to their own and others users' research papers.
 
 ## Full Future Application Features
 
@@ -18,7 +11,7 @@ Read and review research papers together!
 - Users can view research papers added to the application and read their PDF files.
 - Users can classify their research papers (e.g. field, topic, ...)
 - Users can search for research papers by keyword and tags.
-- Users have profile pages that display statics and research papers they have added.
+- [in progress] Users have profile pages that display statics and research papers they have added.
 - Users can add comments to their own and others users' research papers.
 
 ## Installation
