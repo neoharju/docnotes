@@ -1,7 +1,8 @@
 """SQLite database helpers"""
 
 import sqlite3
-from contextlib import closing
+from collections.abc import Iterator
+from contextlib import closing, contextmanager
 from typing import Any, cast
 
 from flask import current_app, g
@@ -24,6 +25,13 @@ def execute(sql: str, params: list[Any] | None = None) -> None:
         result = con.execute(sql, params)
 
     g.last_insert_id = result.lastrowid
+
+
+@contextmanager
+def transaction() -> Iterator[sqlite3.Connection]:
+    """commit if block finishes or cancel/roll back if it raises an error"""
+    with closing(get_connection()) as con, con:
+        yield con
 
 
 def last_insert_id() -> int | None:

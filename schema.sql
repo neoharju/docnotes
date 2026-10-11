@@ -28,3 +28,11 @@ CREATE TABLE comments (
 
 CREATE INDEX idx_comments_item_id ON comments (item_id);
 
+CREATE TABLE item_keywords (
+    item_id INTEGER NOT NULL,
+    keyword TEXT NOT NULL,
+    PRIMARY KEY (item_id, keyword),
+    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
+) WITHOUT ROWID;
+
+CREATE INDEX idx_item_keywords_keyword ON item_keywords (keyword);

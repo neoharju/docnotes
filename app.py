@@ -127,18 +127,21 @@ def logout() -> ResponseReturnValue:
 
 @app.route("/items")
 def item_list() -> ResponseReturnValue:
-    """Display all items or a searched item"""
-    keyword = request.args.get("search", "").strip()
+    """Display all items, search results or items with keyword"""
+    search = request.args.get("search", "").strip()
+    keyword = items.normalize_keyword(request.args.get("keyword", ""))
 
-    if len(keyword) > 200:
+    if len(search) > 200 or len(keyword) > items.MAX_KEYWORD_LENGTH:
         abort(400, "Search query too long")
 
     if keyword:
-        all_items = items.search_items(keyword)
+        all_items = items.get_items_with_keyword(keyword)
+    elif search:
+        all_items = items.search_items(search)
     else:
         all_items = items.get_all_items()
 
-    return render_template("items/list.html", items=all_items, search=keyword)
+    return render_template("items/list.html", items=all_items, search=search, keyword=keyword)
 
 
 @app.route("/items/new", methods=["GET", "POST"])
@@ -152,29 +155,34 @@ def item_new() -> ResponseReturnValue:
 
     check_csrf()
     title = request.form.get("title", "").strip()
+    keyword_text = request.form.get("keywords", "")
+    filled = {"title": title, "keywords": keyword_text}
 
     if not 1 <= len(title) <= 100:
         flash("Title must be between 1 and 100 characters")
-        return render_template("items/new.html", filled={"title": title})
+        return render_template("items/new.html", filled=filled)
+
+    try:
+        keywords = items.parse_keywords(keyword_text)
+    except ValueError as error:
+        flash(str(error))
+        return render_template("items/new.html", filled=filled)
 
     uploaded_file = request.files.get("pdf")
 
     if uploaded_file is None:
         flash("No file was selected")
-        return render_template(
-            "items/new.html",
-            filled={"title": title},
-        )
+        return render_template("items/new.html", filled=filled)
 
     try:
         pdf_data = read_pdf(uploaded_file, current_app.config["MAX_PDF_SIZE"])
     except UploadError as error:
         flash(str(error))
-        return render_template("items/new.html", filled={"title": title})
+        return render_template("items/new.html", filled=filled)
 
     filename = secure_filename(uploaded_file.filename or "") or "doc.pdf"
 
-    item_id = items.create_item(user_id, title, filename, pdf_data)
+    item_id = items.create_item(user_id, title, filename, pdf_data, keywords)
     return redirect(f"/items/{item_id}")
 
 
@@ -202,14 +210,23 @@ def item_edit(item_id: int) -> ResponseReturnValue:
         abort(403)
 
     if request.method == "GET":
-        return render_template("items/edit.html", item=item, filled={"title": item["title"]})
+        filled = {"title": item["title"], "keywords": items.keywords_text(item["keywords"])}
+        return render_template("items/edit.html", item=item, filled=filled)
 
     check_csrf()
     title = request.form.get("title", "").strip()
+    keyword_text = request.form.get("keywords", "")
+    filled = {"title": title, "keywords": keyword_text}
 
     if not 1 <= len(title) <= 100:
         flash("Title must be between 1 and 100 characters")
-        return render_template("items/edit.html", item=item, filled={"title": title})
+        return render_template("items/edit.html", item=item, filled=filled)
+
+    try:
+        keywords = items.parse_keywords(keyword_text)
+    except ValueError as error:
+        flash(str(error))
+        return render_template("items/edit.html", item=item, filled=filled)
 
     replacement = request.files.get("pdf")
     if replacement is not None and replacement.filename:
@@ -217,11 +234,11 @@ def item_edit(item_id: int) -> ResponseReturnValue:
             pdf_data = read_pdf(replacement, current_app.config["MAX_PDF_SIZE"])
         except UploadError as error:
             flash(str(error))
-            return render_template("items/edit.html", item=item, filled={"title": title})
+            return render_template("items/edit.html", item=item, filled=filled)
         filename = secure_filename(replacement.filename) or item["filename"]
-        items.edit_item(item_id, title, filename, pdf_data)
+        items.edit_item(item_id, title, filename, pdf_data, keywords=keywords)
     else:
-        items.edit_item(item_id, title)
+        items.edit_item(item_id, title, keywords=keywords)
 
     return redirect(f"/items/{item_id}")
 

@@ -1,0 +1,9 @@
+{% macro keyword_chips(keywords) %}
+{% if keywords %}
+<ul class="keywords">
+	{% for keyword in keywords.split(',') | sort %}
+	<li><a href="{{ url_for('item_list', keyword=keyword) }}">{{ keyword }}</a></li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}

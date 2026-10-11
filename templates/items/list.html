@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% from "items/table.html" import items_table %}
+{% from "items/keywords.html" import keyword_chips %}
 
 {% block title %}Docs{% endblock %}
 
@@ -7,13 +8,20 @@
 <h2>Shared PDFs</h2>
 
 <form class="search-form" action="{{ url_for('item_list') }}" method="get">
-	<input type="text" name="search" value="{{ search }}" maxlength="200" 
-				 placeholder="Search by title, filename or uploader..." />
+	<input type="text" name="search" value="{{ search }}" maxlength="200"
+				 placeholder="Search by title, filename, uploader or keyword..." />
 	<button type="submit">Search</button>
 	{% if search %}
 		<a class="button" href="{{ url_for('item_list') }}">Clear</a>
 	{% endif %}
 </form>
+
+{% if keyword %}
+	<div class="keyword-filter">
+		Keyword: {{ keyword_chips(keyword) }}
+		<a class="button" href="{{ url_for('item_list') }}">Clear</a>
+	</div>
+{% endif %}
 
 {% if session.user_id %}
 	<p><a href="{{ url_for('item_new') }}">Upload a PDF</a></p>

@@ -1,8 +1,11 @@
+{% from "items/keywords.html" import keyword_chips %}
+
 {% macro items_table(items, show_uploader=true) %}
 <div class="table-wrap">
 	<table class="items-table">
 		<tr>
 			<th>Title</th>
+			<th>Keywords</th>
 			{% if show_uploader %}<th>Uploaded by</th>{% endif %}
 			<th>Uploaded</th>
 		</tr>
@@ -11,6 +14,7 @@
 			<td>
 				<a href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>
 			</td>
+			<td>{{ keyword_chips(item.keywords) }}</td>
 			{% if show_uploader %}
 			<td>
 				<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{ item.username }}</a>

@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "items/keywords.html" import keyword_chips %}
 
 {% block title %}{{ item.title }}{% endblock %}
 
@@ -12,6 +13,8 @@ Uploaded by
 </a>
 on {{ item.created_at }}
 </p>
+
+{{ keyword_chips(item.keywords) }}
 
 <div class="item-actions">
     <div class="item-file">
