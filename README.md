@@ -8,6 +8,7 @@ Read and review research papers together!
 - User who owns the pdf can edit the title and delete it
 - User can search for pdfs based on name, title or by user who uploaded them
 - User can open pdf in new tab
+- Users can add comments to their own and others users' research papers.
 
 ## Full Future Application Features
 
