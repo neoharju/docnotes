@@ -1,4 +1,6 @@
 {% extends "layout.html" %}
+{% from "items/search.html" import search_form %}
+{% from "items/table.html" import items_table %}
 
 {% block title %}DocNotes{% endblock %}
 
@@ -8,4 +10,20 @@
 				  alt="DocNotes logo" width="1536" height="1024" />
 <p>Share PDF documents and discuss them with fellow users</p>
 
+<p>
+	<a class="button" href="{{ url_for('item_new') }}">Upload a PDF</a>
+	{% if not session.user_id %}
+		<a class="button" href="{{ url_for('register') }}">Create an account</a>
+	{% endif %}
+</p>
+
+{{ search_form() }}
+
+<h3>Latest PDFs</h3>
+{% if items %}
+	{{ items_table(items) }}
+	<p><a href="{{ url_for('item_list') }}">See all PDFs</a></p>
+{% else %}
+	<p>No PDFs have been shared yet. Upload the first one!</p>
+{% endif %}
 {% endblock %}

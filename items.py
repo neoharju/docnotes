@@ -100,16 +100,17 @@ def get_item(item_id: int) -> sqlite3.Row | None:
     return rows[0] if rows else None
 
 
-def get_all_items() -> list[sqlite3.Row]:
-    """Get all items by users, else None"""
+def get_all_items(limit: int = -1) -> list[sqlite3.Row]:
+    """All items, most recent first"""
 
     query = f"""
         SELECT {_METADATA_COLS} 
         FROM items
         JOIN users ON items.user_id = users.id
         ORDER BY items.id DESC
+        LIMIT ?
     """
-    return db.query(query)
+    return db.query(query, [limit])
 
 
 def get_item_pdf(item_id: int) -> sqlite3.Row | None:

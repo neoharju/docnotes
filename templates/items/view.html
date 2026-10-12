@@ -8,9 +8,7 @@
 
 <p>
 Uploaded by
-<a href="{{ url_for('user_profile', user_id=item.user_id) }}">
-	{{ item.username }}
-</a>
+<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{ item.username }}</a>
 on {{ item.created_at }}
 </p>
 
