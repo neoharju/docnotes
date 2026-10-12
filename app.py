@@ -85,36 +85,49 @@ def index() -> str:
     return render_template("index.html")
 
 
+# helper function to start session
+def _start_session(user_id: int, username: str) -> None:
+    """Log in the user with a new session"""
+    session.clear()
+    session["user_id"] = user_id
+    session["username"] = username
+    session["csrf_token"] = secrets.token_hex(64)  # was 32
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register() -> ResponseReturnValue:
-    """Register new user"""
+    """Register new user and log them in"""
     if request.method == "GET":
-        return render_template("register.html", filled={})
+        next_page = safe_redirect_url(request.args.get("next", "/"))
+        return render_template("register.html", next_page=next_page, filled={})
 
     username = request.form.get("username", "").strip()
     password_1 = request.form.get("password_1", "")
     password_2 = request.form.get("password_2", "")
+    next_page = safe_redirect_url(request.form.get("next_page", "/"))
+
+    # Helper function for repetetive code
+    def retry(message: str) -> str:
+        flash(message)
+        return render_template("register.html", next_page=next_page, filled={"username": username})
 
     if not _lim["min_username_length"] <= len(username) <= _lim["max_username_length"]:
-        flash("Username should be between 2 and 20 characters")
-        return render_template("register.html", filled={"username": username})
+        return retry("Username should be between 2 and 20 characters")
 
     if not _lim["min_password_length"] <= len(password_1) <= _lim["max_password_length"]:
-        flash(f"Password must be at least {_lim['min_password_length']} characters")
-        return render_template("register.html", filled={"username": username})
+        return retry(f"Password must be at least {_lim['min_password_length']} characters")
 
     if password_1 != password_2:
-        flash("The passwords do not match!")
-        return render_template("register.html", filled={"username": username})
+        return retry("The passwords do not match!")
 
     try:
-        users.create_user(username, password_1)
+        user_id = users.create_user(username, password_1)
     except sqlite3.IntegrityError:
-        flash("Username is unavailable")
-        return render_template("register.html", filled={"username": username})
+        return retry("Username is unavailable")
 
-    flash("Account created. You may now login")
-    return redirect("/")
+    _start_session(user_id, username)
+    flash(f"Welcome, {username}! Thanks for joining us.")
+    return redirect(next_page)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -137,10 +150,7 @@ def login() -> ResponseReturnValue:
         flash("Wrong username or password")
         return render_template("login.html", next_page=next_page, filled={"username": username})
 
-    session.clear()
-    session["user_id"] = user_id
-    session["username"] = username
-    session["csrf_token"] = secrets.token_hex(32)
+    _start_session(user_id, username)
 
     return redirect(next_page)
 

@@ -2,12 +2,13 @@
 """Helper functions for user management"""
 
 import sqlite3
+from typing import cast
 
 import db
 from werkzeug.security import generate_password_hash
 
 
-def create_user(username: str, password: str) -> None:
+def create_user(username: str, password: str) -> int:
     """Create a new user account"""
     password_hash = generate_password_hash(password)
 
@@ -15,7 +16,10 @@ def create_user(username: str, password: str) -> None:
         INSERT INTO users (username, password_hash)
         VALUES (?, ?)
     """
-    db.execute(query, [username, password_hash])
+    with db.transaction() as con:
+        user_id = con.execute(query, [username, password_hash])
+
+    return cast(int, user_id)
 
 
 def get_user(user_id: int) -> sqlite3.Row | None:
