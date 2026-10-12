@@ -1,14 +1,20 @@
 """App configuration"""
 
+import os
+
 
 class Config:
     """App confs"""
 
-    SECRET_KEY = "123"  # os.environ["SECRET_KEY"]
+    try:
+        SECRET_KEY = os.environ["SECRET_KEY"]
+    except KeyError:
+        raise KeyError("SECRET_KEY missing from env")
+
     DATABASE = "database.db"
 
     SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_HTTPOnly = True
+    SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
     # NOTE: max upload 42 MiB

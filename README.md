@@ -29,6 +29,15 @@ Generate the database:
 
 sqlite3 database.db < schema.sql
 ```
+Create a `SECRET_KEY` into environment
+
+```sh
+export SECRET_KEY="myVeryLongSecretKey"
+
+or with the help of a python script
+
+export SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_hex(256))')"
+```
 
 Run the application with
 
