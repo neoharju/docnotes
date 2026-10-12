@@ -338,6 +338,38 @@ input[type="file"]::file-selector-button {
 	background: #66d3fa;
 }
 
+.sort-links {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: 6px;
+	color: black;
+}
+
+.sort-links a,
+.sort-links strong {
+	padding: 2px 10px;
+	font-size: 0.85rem;
+	border: 1px solid #3c99dc;
+	border-radius: 10px;
+	text-decoration: none;
+}
+
+.sort-links a {
+	color: #0f5298;
+	background: #d5f3fe;
+}
+
+.sort-links a:hover {
+	background: #66d3fa;
+}
+
+.sort-links strong {
+	color: white;
+	background: #0f5298;
+}
+
 .keyword-filter {
 	display: flex;
 	justify-content: center;

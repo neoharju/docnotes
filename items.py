@@ -23,6 +23,11 @@ _METADATA_COLS = """
      WHERE comments.item_id = items.id) AS comment_count
 """
 
+SORT_ORDERS = {
+    "recent": "items.id DESC",
+    "comments": "comment_count DESC, items.id DESC",
+}
+
 
 def normalize_keyword(text: str) -> str:
     """normalize keywords, so they can be grouped better;
@@ -102,14 +107,14 @@ def get_item(item_id: int) -> sqlite3.Row | None:
     return rows[0] if rows else None
 
 
-def get_all_items(limit: int = -1) -> list[sqlite3.Row]:
-    """All items, most recent first"""
+def get_all_items(sort: str = "recent", limit: int = -1) -> list[sqlite3.Row]:
+    """All items in SORT_ORDERS[sort] order"""
 
     query = f"""
         SELECT {_METADATA_COLS} 
         FROM items
         JOIN users ON items.user_id = users.id
-        ORDER BY items.id DESC
+        ORDER BY {SORT_ORDERS[sort]}
         LIMIT ?
     """
     return db.query(query, [limit])
@@ -180,7 +185,7 @@ def _like_pattern(text: str) -> str:
     return f"%{escaped}%"
 
 
-def search_items(text: str) -> list[sqlite3.Row]:
+def search_items(text: str, sort: str = "recent") -> list[sqlite3.Row]:
     """Search titles, filenames, uploaders and keywords by literal substring."""
 
     pattern = _like_pattern(text)
@@ -196,21 +201,21 @@ def search_items(text: str) -> list[sqlite3.Row]:
            OR EXISTS (SELECT 1 FROM item_keywords
                       WHERE item_keywords.item_id = items.id
                         AND item_keywords.keyword LIKE ? ESCAPE '\\')
-        ORDER BY items.id DESC
+        ORDER BY {SORT_ORDERS[sort]}
     """
 
     return db.query(query, [pattern, pattern, pattern, keyword_pattern])
 
 
-def get_items_with_keyword(keyword: str) -> list[sqlite3.Row]:
-    """Items tagged with exactly this keyword, most recent first"""
+def get_items_with_keyword(keyword: str, sort: str = "recent") -> list[sqlite3.Row]:
+    """Items tagged with exactly this keyword, in SORT_ORDERS[sort] order"""
 
     query = f"""
         SELECT {_METADATA_COLS}
         FROM items
         JOIN users ON items.user_id = users.id
         WHERE items.id IN (SELECT item_id FROM item_keywords WHERE keyword = ?)
-        ORDER BY items.id DESC
+        ORDER BY {SORT_ORDERS[sort]}
     """
 
     return db.query(query, [keyword])

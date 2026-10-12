@@ -169,18 +169,23 @@ def item_list() -> ResponseReturnValue:
     """Display all items, search results or items with keyword"""
     search = request.args.get("search", "").strip()
     keyword = items.normalize_keyword(request.args.get("keyword", ""))
+    sort = request.args.get("sort", "recent")
+    if sort not in items.SORT_ORDERS:
+        sort = "recent"
 
     if len(search) > 200 or len(keyword) > items.MAX_KEYWORD_LENGTH:
         abort(400, "Search query too long")
 
     if keyword:
-        all_items = items.get_items_with_keyword(keyword)
+        all_items = items.get_items_with_keyword(keyword, sort)
     elif search:
-        all_items = items.search_items(search)
+        all_items = items.search_items(search, sort)
     else:
-        all_items = items.get_all_items()
+        all_items = items.get_all_items(sort)
 
-    return render_template("items/list.html", items=all_items, search=search, keyword=keyword)
+    return render_template(
+        "items/list.html", items=all_items, search=search, keyword=keyword, sort=sort
+    )
 
 
 @app.route("/items/new", methods=["GET", "POST"])

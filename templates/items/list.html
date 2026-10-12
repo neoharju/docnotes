@@ -8,7 +8,7 @@
 {% block content %}
 <h2>Shared PDFs</h2>
 
-{{ search_form(search) }}
+{{ search_form(search, sort) }}
 
 {% if keyword %}
 	<div class="keyword-filter">
@@ -22,6 +22,16 @@
 {% endif %}
 
 {% if items %}
+	<p class="sort-links">
+		{% for value, label in [("recent", "Most recent"), ("comments", "Most comments")] %}
+			{% if value == sort %}
+				<strong aria-current="true">{{ label }}</strong>
+			{% else %}
+				<a href="{{ url_for('item_list', search=search or None, keyword=keyword or None,
+					sort=value if value != 'recent' else None) }}">{{ label }}</a>
+			{% endif %}
+		{% endfor %}
+	</p>
 	{{ items_table(items) }}
 {% else %}
 	<p>No items found</p>
