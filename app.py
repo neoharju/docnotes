@@ -46,7 +46,7 @@ else:
 @app.context_processor
 def form_limits() -> dict[str, int]:
     return {
-        "max_pdf_mb": app.config["MAX_PDF_SIZE"],
+        "max_pdf_mb": app.config["MAX_PDF_SIZE"] // (1024 * 1024),
         "min_password_length": app.config["MIN_PASSWORD_LENGTH"],
         "max_password_length": app.config["MAX_PASSWORD_LENGTH"],
         "min_username_length": app.config["MIN_USERNAME_LENGTH"],

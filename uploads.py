@@ -19,7 +19,7 @@ def read_pdf(file: FileStorage | None, max_bytes: int) -> bytes:
         raise UploadError("No file was selected")
 
     if len(file.filename) > _MAX_FILENAME_LENGTH:
-        raise UploadError("File name must be max {MAX_FILENAME_LENGTH} characters")
+        raise UploadError(f"File name must be max {_MAX_FILENAME_LENGTH} characters")
 
     data: bytes = file.read(MAX_PDF_BYTES + 1)
     # NOTE: File exists already, would be better to validate beforehand
