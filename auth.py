@@ -5,7 +5,7 @@ import secrets
 from urllib.parse import urlparse
 
 import db
-from flask import abort, request, session
+from flask import abort, flash, redirect, request, session, url_for
 from werkzeug.security import check_password_hash
 
 
@@ -36,13 +36,30 @@ def authenticate_user(username: str, password: str) -> int | None:
 
 
 def require_user_id() -> int:
-    """Require user to be authenticated"""
+    """Return the logged in user's ID or redirect to login page."""
     user_id = session.get("user_id")
+    if isinstance(user_id, int):
+        return user_id
 
-    if not isinstance(user_id, int):
-        abort(403)
+    if request.method == "GET":
+        next_page = request.full_path.removesuffix("?")
+    else:
+        next_page = _same_host_path(request.referrer)
 
-    return user_id
+    flash("Log in to continue")
+    abort(redirect(url_for("login", next=next_page)))
+
+
+def _same_host_path(url: str | None) -> str:
+    """Path of a URL on host else '/'"""
+    if not url:
+        return "/"
+
+    parsed = urlparse(url)
+    if parsed.netloc != request.host:
+        return "/"
+
+    return f"{parsed.path}?{parsed.query}" if parsed.query else parsed.path or "/"
 
 
 def check_csrf() -> None:

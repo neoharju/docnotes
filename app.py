@@ -119,9 +119,9 @@ def login() -> ResponseReturnValue:
 @app.route("/logout", methods=["POST"])
 def logout() -> ResponseReturnValue:
     """Log out the current user"""
-    require_user_id()
-    check_csrf()
-    session.clear()
+    if "user_id" in session:
+        check_csrf()
+        session.clear()
     return redirect("/")
 
 
