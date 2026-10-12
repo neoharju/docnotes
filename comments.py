@@ -20,8 +20,11 @@ def get_comments(item_id: int) -> list[sqlite3.Row]:
     """Return all comments on an item, oldest first (reading order)"""
 
     query = """
-        SELECT comments.id, comments.content, comments.created_at,
-               comments.user_id, users.username
+        SELECT comments.id,
+               comments.content, 
+               datetime(comments.created_at, 'localtime') AS created_at,
+               comments.user_id,
+               users.username
         FROM comments
         JOIN users ON comments.user_id = users.id
         WHERE comments.item_id = ?
