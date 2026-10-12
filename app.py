@@ -23,6 +23,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 from uploads import UploadError, read_pdf
+from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -34,6 +35,14 @@ elif environ.get("FLASK_ENV") == "dev":
     app.config.from_object(DevConfig)
 else:
     app.config.from_object(Config)
+
+
+@app.errorhandler(HTTPException)
+def http_error(error: HTTPException) -> ResponseReturnValue:
+    """show HTTP errors inside the layout"""
+    response = error.get_response()
+    response.set_data(render_template("error.html", error=error))
+    return response
 
 
 @app.context_processor
