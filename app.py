@@ -44,7 +44,7 @@ else:
 
 
 @app.context_processor
-def form_limits() -> dict[str, int | str]:
+def form_limits() -> dict[str, int]:
     return {
         "max_pdf_mb": app.config["MAX_PDF_SIZE"],
         "min_password_length": app.config["MIN_PASSWORD_LENGTH"],
