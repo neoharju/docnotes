@@ -32,6 +32,6 @@
 
 	<button type="submit">log in</button>
 </form>
-<a href="{{ url_for('register') }}">Create an account</a>
+<a href="{{ url_for('register', next=next_page if next_page != '/' else None) }}">Create an account</a>
 
 {% endblock %}

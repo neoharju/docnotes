@@ -38,8 +38,9 @@
       autocomplete="new-password"
       required />
   </p>
+  <input type="hidden" name="next_page" value="{{ next_page | default('/') }}" />
   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
   <button type="submit">create</button>
 </form>
-
+<a href="{{ url_for('login', next=next_page if next_page != '/' else None) }}">Log in</a>
 {% endblock %}
