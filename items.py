@@ -72,12 +72,15 @@ def create_item(
     """New items owned by user_id are linked with its keywords"""
 
     query = """
-        INSERT INTO items (user_id, title, filename, pdf_data)
-        values (?, ?, ?, ?)
+        INSERT INTO items (user_id, title, filename)
+        values (?, ?, ?)
     """
     with db.transaction() as con:
-        item_id = con.execute(query, [user_id, title, filename, pdf_data]).lastrowid
+        item_id = con.execute(query, [user_id, title, filename]).lastrowid
         if item_id is not None:
+            con.execute(
+                "INSERT INTO item_files (item_id, pdf_data) VALUES (?, ?)", [item_id, pdf_data]
+            )
             _insert_keywords(con, item_id, keywords)
 
     return item_id
@@ -113,9 +116,10 @@ def get_item_pdf(item_id: int) -> sqlite3.Row | None:
     """Returns filename and raw PDF bytes, else None"""
 
     query = """
-        SELECT filename, pdf_data
+        SELECT items.filename, item_files.pdf_data
         FROM items
-        WHERE id = ?
+        JOIN item_files ON item_files.item_id = items.id
+        WHERE items.id = ?
     """
 
     rows = db.query(query, [item_id])
@@ -149,10 +153,11 @@ def edit_item(
         if filename is not None and pdf_data is not None:
             query = """
                 UPDATE items
-                SET title = ?, filename = ?, pdf_data = ?
+                SET title = ?, filename = ?
                 WHERE id = ?
             """
-            con.execute(query, [title, filename, pdf_data, item_id])
+            con.execute(query, [title, filename, item_id])
+            con.execute("UPDATE item_files SET pdf_data = ? WHERE item_id = ?", [pdf_data, item_id])
         else:
             query = """
                 UPDATE items
@@ -209,7 +214,7 @@ def get_items_with_keyword(keyword: str) -> list[sqlite3.Row]:
 
 
 def delete_item(item_id: int) -> None:
-    """Deletes item and things related to it by foreign key"""
+    """Deletes item; its PDF, keywords and comments go by ON DELETE CASCADE"""
 
     query = """
         DELETE FROM items

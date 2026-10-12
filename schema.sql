@@ -9,12 +9,17 @@ CREATE TABLE items (
 	user_id INTEGER NOT NULL,
 	title TEXT NOT NULL,
 	filename TEXT NOT NULL,
-	pdf_data BLOB NOT NULL,
 	created_at TEXT NOT NULL DEFAULT (datetime('now')),
 	FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE INDEX idx_items_user_id ON items (user_id);
+
+CREATE TABLE item_files (
+	item_id INTEGER PRIMARY KEY,
+	pdf_data BLOB NOT NULL,
+	FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
+);
 
 CREATE TABLE comments (
     id INTEGER PRIMARY KEY,
