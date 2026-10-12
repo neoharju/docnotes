@@ -82,7 +82,7 @@ def http_error(error: HTTPException) -> ResponseReturnValue:
 @app.route("/")
 def index() -> str:
     """Home page"""
-    return render_template("index.html", items=items.get_all_items(limit=5))
+    return render_template("index.html", items=items.get_all_items(limit=3))
 
 
 # helper function to start session

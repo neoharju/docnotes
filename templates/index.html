@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% from "items/search.html" import search_form %}
-{% from "items/table.html" import items_table %}
+{% from "items/keywords.html" import keyword_chips %}
 
 {% block title %}DocNotes{% endblock %}
 
@@ -21,7 +21,21 @@
 
 <h3>Latest PDFs</h3>
 {% if items %}
-	{{ items_table(items) }}
+	<ol class="latest">
+		{% for item in items %}
+		<li>
+			<div class="latest-main">
+				<a class="latest-title" href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>
+				{{ keyword_chips(item.keywords) }}
+			</div>
+			<div class="latest-meta">
+				<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{ item.username }}</a>
+				<span>{{ item.comment_count }} comment{{ "" if item.comment_count == 1 else "s" }}</span>
+				<time datetime="{{ item.created_at }}">{{ item.created_at[:16] }}</time>
+			</div>
+		</li>
+		{% endfor %}
+	</ol>
 	<p><a href="{{ url_for('item_list') }}">See all PDFs</a></p>
 {% else %}
 	<p>No PDFs have been shared yet. Upload the first one!</p>
