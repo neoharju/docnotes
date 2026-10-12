@@ -18,7 +18,9 @@ _METADATA_COLS = """
     items.id, items.title, items.filename, datetime(items.created_at,
     'localtime') AS created_at, items.user_id, users.username,
     (SELECT group_concat(keyword, ',') FROM item_keywords
-     WHERE item_keywords.item_id = items.id) AS keywords
+     WHERE item_keywords.item_id = items.id) AS keywords,
+    (SELECT count(*) FROM comments
+     WHERE comments.item_id = items.id) AS comment_count
 """
 
 

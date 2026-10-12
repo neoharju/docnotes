@@ -7,6 +7,7 @@
 			<th>Title</th>
 			<th>Keywords</th>
 			{% if show_uploader %}<th>Uploaded by</th>{% endif %}
+			<th class="count">Comments</th>
 			<th>Uploaded</th>
 		</tr>
 		{% for item in items %}
@@ -20,6 +21,7 @@
 				<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{ item.username }}</a>
 			</td>
 			{% endif %}
+			<td class="count">{{ item.comment_count }}</td>
 			<td class="date">{{ item.created_at }}</td>
 		</tr>
 		{% endfor %}

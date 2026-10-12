@@ -375,6 +375,10 @@ input[type="file"]::file-selector-button {
 	white-space: nowrap;
 }
 
+.items-table .count {
+	text-align: center;
+}
+
 .logo {
 	width: 100%;
 	max-width: 600px;
