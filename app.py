@@ -8,7 +8,13 @@ from os import environ
 import comments
 import items
 import users
-from auth import authenticate_user, check_csrf, require_owner, require_user_id, safe_redirect_url
+from auth import (
+    authenticate_user,
+    check_csrf,
+    require_owner,
+    require_user_id,
+    safe_redirect_url,
+)
 from config import Config, DevConfig, TestConfig
 from flask import (
     Flask,
@@ -23,7 +29,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 from uploads import UploadError, read_pdf
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -37,18 +43,10 @@ else:
     app.config.from_object(Config)
 
 
-@app.errorhandler(HTTPException)
-def http_error(error: HTTPException) -> ResponseReturnValue:
-    """show HTTP errors inside the layout"""
-    response = error.get_response()
-    response.set_data(render_template("error.html", error=error))
-    return response
-
-
 @app.context_processor
 def form_limits() -> dict[str, int | str]:
     return {
-        "max_content_length": app.config["MAX_CONTENT_LENGTH"],
+        "max_pdf_mb": app.config["MAX_PDF_SIZE"],
         "min_password_length": app.config["MIN_PASSWORD_LENGTH"],
         "max_password_length": app.config["MAX_PASSWORD_LENGTH"],
         "min_username_length": app.config["MIN_USERNAME_LENGTH"],
@@ -57,6 +55,28 @@ def form_limits() -> dict[str, int | str]:
 
 
 _lim = form_limits()
+
+
+@app.errorhandler(RequestEntityTooLarge)
+def request_too_large(error: RequestEntityTooLarge) -> ResponseReturnValue:
+    """MAX_PDF_SIZE is the largest possible upload, if it is exceeded
+    send user back to upload form with message
+    """
+
+    if request.endpoint not in ("item_new", "item_edit"):
+        return http_error(error)
+
+    flash(f"Upload limit is for PDFs {_lim['max_pdf_mb']} MB")
+
+    return redirect(request.path, 303)
+
+
+@app.errorhandler(HTTPException)
+def http_error(error: HTTPException) -> ResponseReturnValue:
+    """show HTTP errors inside the layout"""
+    response = error.get_response()
+    response.set_data(render_template("error.html", error=error))
+    return response
 
 
 @app.route("/")
@@ -214,7 +234,10 @@ def item_edit(item_id: int) -> ResponseReturnValue:
     item = require_owner(items.get_item(item_id), user_id)
 
     if request.method == "GET":
-        filled = {"title": item["title"], "keywords": items.keywords_text(item["keywords"])}
+        filled = {
+            "title": item["title"],
+            "keywords": items.keywords_text(item["keywords"]),
+        }
         return render_template("items/edit.html", item=item, filled=filled)
 
     check_csrf()

@@ -16,7 +16,7 @@
 			   maxlength="400" placeholder="keywords (comma-separated): e.g. cs, physics, ml" />
 	</p>
 	<p>
-		<label for="pdf">Replace PDF file (optional, max 10 MB):</label><br />
+	<label for="pdf">Replace PDF file (optional, max {{ max_pdf_mb }} MB):</label><br />
 		<input type="file" id="pdf" name="pdf" accept="application/pdf" />
 		<br />
 		<small>Current file: {{ item.filename }}. Leave empty to keep it.</small>

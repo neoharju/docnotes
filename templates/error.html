@@ -4,6 +4,8 @@
 	400: ("Bad request", error.description),
 	403: ("Not allowed", "Permission denied"),
 	404: ("Not found", "This does not exist."),
+	413: ("File too large", "The upload is too large. PDF upload limit is %d
+	MB." % max_pdf_mb),
 	500: ("Something went wrong", "Something went wrong"),
 } %}
 
