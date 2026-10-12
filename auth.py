@@ -2,6 +2,7 @@
 """Auth helpers"""
 
 import secrets
+import sqlite3
 from urllib.parse import urlparse
 
 import db
@@ -87,3 +88,15 @@ def safe_redirect_url(url: str) -> str:
         return "/"
 
     return url
+
+
+def require_owner(row: sqlite3.Row | None, user_id: int) -> sqlite3.Row:
+    """Return row if owned by user_id, else 403, and 404 if it does not exist"""
+
+    if row is None:
+        abort(404)
+
+    if row["user_id"] != user_id:
+        abort(403)
+
+    return row

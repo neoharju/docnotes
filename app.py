@@ -8,7 +8,7 @@ from os import environ
 import comments
 import items
 import users
-from auth import authenticate_user, check_csrf, require_user_id, safe_redirect_url
+from auth import authenticate_user, check_csrf, require_owner, require_user_id, safe_redirect_url
 from config import Config, DevConfig, TestConfig
 from flask import (
     Flask,
@@ -201,13 +201,8 @@ def item_view(item_id: int) -> ResponseReturnValue:
 def item_edit(item_id: int) -> ResponseReturnValue:
     """User edit own PDF's title or replaces the it"""
     user_id = require_user_id()
-    item = items.get_item(item_id)
 
-    if item is None:
-        abort(404)
-
-    if item["user_id"] != user_id:
-        abort(403)
+    item = require_owner(items.get_item(item_id), user_id)
 
     if request.method == "GET":
         filled = {"title": item["title"], "keywords": items.keywords_text(item["keywords"])}
@@ -248,14 +243,7 @@ def item_delete(item_id: int) -> ResponseReturnValue:
     """User deletes own item"""
     user_id = require_user_id()
     check_csrf()
-
-    item = items.get_item(item_id)
-
-    if item is None:
-        abort(404)
-
-    if item["user_id"] != user_id:
-        abort(403)
+    require_owner(items.get_item(item_id), user_id)
 
     items.delete_item(item_id)
     return redirect("/items")
@@ -312,12 +300,7 @@ def comment_delete(comment_id: int) -> ResponseReturnValue:
     user_id = require_user_id()
     check_csrf()
 
-    comment = comments.get_comment(comment_id)
-    if comment is None:
-        abort(404)
-
-    if comment["user_id"] != user_id:
-        abort(403)
+    comment = require_owner(comments.get_comment(comment_id), user_id)
 
     comments.delete_comment(comment_id)
     return redirect(f"/items/{comment['item_id']}")
