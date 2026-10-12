@@ -40,6 +40,21 @@ def get_user(user_id: int) -> sqlite3.Row | None:
     return rows[0]
 
 
+def get_stats(user_id: int) -> sqlite3.Row:
+    """Stats for the user's profile page"""
+
+    query = """
+        SELECT
+            (SELECT count(*) FROM items WHERE user_id = ?) AS pdfs,
+            (SELECT count(*) FROM comments WHERE user_id = ?) AS comments_written,
+            (SELECT count(*)
+             FROM comments
+             JOIN items ON items.id = comments.item_id
+             WHERE items.user_id = ? AND comments.user_id != ?) AS comments_received
+    """
+    return db.query(query, [user_id] * 4)[0]
+
+
 def get_messages(user_id: int) -> None:
     """Get user messages"""
 

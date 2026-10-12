@@ -411,6 +411,34 @@ input[type="file"]::file-selector-button {
 	text-align: center;
 }
 
+.stats {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	margin: 20px 0;
+}
+
+.stats div {
+	min-width: 9em;
+	padding: 10px 15px;
+	background: #eef9fe;
+	border: 2px solid #3c99dc;
+	border-radius: 10px;
+}
+
+.stats dt {
+	font-size: 0.85rem;
+	color: #0f5298;
+}
+
+.stats dd {
+	margin: 5px 0 0;
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: black;
+}
+
 .logo {
 	width: 100%;
 	max-width: 600px;

@@ -32,6 +32,7 @@ CREATE TABLE comments (
 );
 
 CREATE INDEX idx_comments_item_id ON comments (item_id);
+CREATE INDEX idx_comments_user_id ON comments (user_id);
 
 CREATE TABLE item_keywords (
     item_id INTEGER NOT NULL,

@@ -6,6 +6,12 @@
 {% block content %}
 <h2>{{ profile_user.username }}</h2>
 
+<dl class="stats">
+	<div><dt>PDFs shared</dt><dd>{{ stats.pdfs }}</dd></div>
+	<div><dt>Comments written</dt><dd>{{ stats.comments_written }}</dd></div>
+	<div><dt>Comments received</dt><dd>{{ stats.comments_received }}</dd></div>
+</dl>
+
 <h3>Uploaded items</h3>
 
 {% if items %}

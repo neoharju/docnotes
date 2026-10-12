@@ -313,14 +313,17 @@ def item_pdf(item_id: int) -> ResponseReturnValue:
 
 @app.route("/users/<int:user_id>")
 def user_profile(user_id: int) -> ResponseReturnValue:
-    """Public profile page with user's uploaded items"""
+    """Public profile page with user's statistics and uploaded items"""
     profile_user = users.get_user(user_id)
 
     if profile_user is None:
         abort(404)
 
     user_items = items.get_all_user_items(user_id)
-    return render_template("users/profile.html", profile_user=profile_user, items=user_items)
+    stats = users.get_stats(user_id)
+    return render_template(
+        "users/profile.html", profile_user=profile_user, items=user_items, stats=stats
+    )
 
 
 @app.route("/items/<int:item_id>/comments", methods=["POST"])
