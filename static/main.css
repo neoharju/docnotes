@@ -518,10 +518,12 @@ textarea:focus-visible {
 	outline-offset: 2px;
 }
 
+/* latest pdfs home page */
 .latest {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+	display: grid;
+	grid-template-columns: fit-content(35%) minmax(8em, 1fr) auto auto auto;
+	grid-auto-rows: minmax(2.75rem, auto);
+	gap: 8px 20px;
 	margin: 0 0 15px;
 	padding: 0;
 	list-style: none;
@@ -529,12 +531,14 @@ textarea:focus-visible {
 }
 
 .latest > li {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
+	display: grid;
+	grid-column: 1 / -1;
+	grid-template-columns: subgrid;
 	align-items: center;
-	gap: 6px 20px;
-	padding: 12px 16px;
+	padding: 6px 16px;
+	font-size: 0.85rem;
+	color: #0f5298;
+	white-space: nowrap;
 	background: #eef9fe;
 	border-radius: 10px;
 	transition: opacity 0.2s ease;
@@ -553,37 +557,32 @@ textarea:focus-visible {
 	opacity: 1;
 }
 
-.latest-main {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 6px 10px;
-}
-
-.latest-title {
-	font-weight: bold;
-	color: #0f5298;
-	text-decoration: none;
-}
-
-.latest .keywords {
-	margin: 0;
-}
-
-.latest-meta {
-	display: flex;
-	gap: 14px;
-	font-size: 0.85rem;
-	color: #0f5298;
-	white-space: nowrap;
-}
-
-.latest-meta a {
+.latest-title,
+.latest-user {
+	overflow: hidden;
+	text-overflow: ellipsis;
 	color: inherit;
 	text-decoration: none;
 }
 
+.latest-title {
+	font-size: 1rem;
+	font-weight: bold;
+}
+
 .latest-title:hover,
-.latest-meta a:hover {
+.latest-user:hover {
 	text-decoration: underline;
+}
+
+.latest-keywords {
+	overflow: hidden;
+	padding: 3px;
+	mask-image: linear-gradient(to left, transparent, #000 2rem);
+}
+
+.latest .keywords {
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	margin: 0;
 }

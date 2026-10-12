@@ -24,15 +24,12 @@
 	<ol class="latest">
 		{% for item in items %}
 		<li>
-			<div class="latest-main">
-				<a class="latest-title" href="{{ url_for('item_view', item_id=item.id) }}">{{ item.title }}</a>
-				{{ keyword_chips(item.keywords) }}
-			</div>
-			<div class="latest-meta">
-				<a href="{{ url_for('user_profile', user_id=item.user_id) }}">{{ item.username }}</a>
-				<span>{{ item.comment_count }} comment{{ "" if item.comment_count == 1 else "s" }}</span>
-				<time datetime="{{ item.created_at }}">{{ item.created_at[:16] }}</time>
-			</div>
+			<a class="latest-title" href="{{ url_for('item_view', item_id=item.id) }}"
+			   title="{{ item.title }}">{{ item.title }}</a>
+			<div class="latest-keywords">{{ keyword_chips(item.keywords) }}</div>
+			<a class="latest-user" href="{{ url_for('user_profile', user_id=item.user_id) }}">{{ item.username }}</a>
+			<span>{{ item.comment_count }} comment{{ "" if item.comment_count == 1 else "s" }}</span>
+			<time datetime="{{ item.created_at }}">{{ item.created_at[:10] }}<span class="latest-clock">{{ item.created_at[10:16] }}</span></time>
 		</li>
 		{% endfor %}
 	</ol>
