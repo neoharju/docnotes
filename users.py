@@ -2,14 +2,13 @@
 """Helper functions for user management"""
 
 import sqlite3
-from typing import cast
 
 import db
 from werkzeug.security import generate_password_hash
 
 
 def create_user(username: str, password: str) -> int:
-    """Create a new user account"""
+    """Create a new user account and return its ID"""
     password_hash = generate_password_hash(password)
 
     query = """
@@ -17,9 +16,11 @@ def create_user(username: str, password: str) -> int:
         VALUES (?, ?)
     """
     with db.transaction() as con:
-        user_id = con.execute(query, [username, password_hash])
+        user_id = con.execute(query, [username, password_hash]).lastrowid
 
-    return cast(int, user_id)
+    if user_id is None:
+        raise RuntimeError("INSERT INTO users returned no row id")
+    return user_id
 
 
 def get_user(user_id: int) -> sqlite3.Row | None:
