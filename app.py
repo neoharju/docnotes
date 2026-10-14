@@ -57,6 +57,30 @@ def form_limits() -> dict[str, int]:
 _lim = form_limits()
 
 
+@app.context_processor
+def form_classes() -> dict[str, object]:
+    """The selectable classes for the forms"""
+
+    if request.endpoint in ("item_new", "item_edit"):
+        return {"all_classes": items.get_all_classes()}
+
+    return {}
+
+
+def _selected_class_ids() -> list[int]:
+    """IDs of the classes"""
+
+    valid_ids = {row["id"] for rows in items.get_all_classes().values() for row in rows}
+    class_ids: set[int] = set()
+
+    for value in request.form.getlist("classes"):
+        if not value.isdecimal() or int(value) not in valid_ids:
+            abort(400, "Unknown classification")
+        class_ids.add(int(value))
+
+    return sorted(class_ids)
+
+
 @app.errorhandler(RequestEntityTooLarge)
 def request_too_large(error: RequestEntityTooLarge) -> ResponseReturnValue:
     """MAX_PDF_SIZE is the largest possible upload, if it is exceeded
@@ -200,7 +224,8 @@ def item_new() -> ResponseReturnValue:
     check_csrf()
     title = request.form.get("title", "").strip()
     keyword_text = request.form.get("keywords", "")
-    filled = {"title": title, "keywords": keyword_text}
+    class_ids = _selected_class_ids()
+    filled = {"title": title, "keywords": keyword_text, "classes": class_ids}
 
     if not 1 <= len(title) <= 100:
         flash("Title must be between 1 and 100 characters")
@@ -226,7 +251,7 @@ def item_new() -> ResponseReturnValue:
 
     filename = secure_filename(uploaded_file.filename or "") or "doc.pdf"
 
-    item_id = items.create_item(user_id, title, filename, pdf_data, keywords)
+    item_id = items.create_item(user_id, title, filename, pdf_data, keywords, class_ids)
     return redirect(f"/items/{item_id}")
 
 
@@ -238,7 +263,10 @@ def item_view(item_id: int) -> ResponseReturnValue:
         abort(404)
 
     item_comments = comments.get_comments(item_id)
-    return render_template("items/view.html", item=item, comments=item_comments)
+    item_classes = items.get_item_classes(item_id)
+    return render_template(
+        "items/view.html", item=item, comments=item_comments, classes=item_classes
+    )
 
 
 @app.route("/items/<int:item_id>/edit", methods=["GET", "POST"])
@@ -252,13 +280,15 @@ def item_edit(item_id: int) -> ResponseReturnValue:
         filled = {
             "title": item["title"],
             "keywords": items.keywords_text(item["keywords"]),
+            "classes": items.get_item_class_ids(item_id),
         }
         return render_template("items/edit.html", item=item, filled=filled)
 
     check_csrf()
     title = request.form.get("title", "").strip()
     keyword_text = request.form.get("keywords", "")
-    filled = {"title": title, "keywords": keyword_text}
+    class_ids = _selected_class_ids()
+    filled = {"title": title, "keywords": keyword_text, "classes": class_ids}
 
     if not 1 <= len(title) <= 100:
         flash("Title must be between 1 and 100 characters")
@@ -278,9 +308,9 @@ def item_edit(item_id: int) -> ResponseReturnValue:
             flash(str(error))
             return render_template("items/edit.html", item=item, filled=filled)
         filename = secure_filename(replacement.filename) or item["filename"]
-        items.edit_item(item_id, title, filename, pdf_data, keywords=keywords)
+        items.edit_item(item_id, title, filename, pdf_data, keywords, class_ids)
     else:
-        items.edit_item(item_id, title, keywords=keywords)
+        items.edit_item(item_id, title, keywords=keywords, class_ids=class_ids)
 
     return redirect(f"/items/{item_id}")
 

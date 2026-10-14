@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% from "items/keywords.html" import keyword_chips %}
+{% from "items/classes.html" import class_list %}
 
 {% block title %}{{ item.title }}{% endblock %}
 
@@ -13,6 +14,7 @@ on {{ item.created_at }}
 </p>
 
 {{ keyword_chips(item.keywords) }}
+{{ class_list(classes) }}
 
 <div class="item-actions">
     <div class="item-file">

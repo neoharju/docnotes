@@ -42,3 +42,26 @@ CREATE TABLE item_keywords (
 ) WITHOUT ROWID;
 
 CREATE INDEX idx_item_keywords_keyword ON item_keywords (keyword);
+
+CREATE TABLE classes (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    value TEXT NOT NULL,
+    UNIQUE (title, value)
+);
+
+INSERT OR IGNORE INTO classes (title, value) VALUES
+    ('Type', 'Lecture notes'),
+    ('Type', 'Exercises'),
+    ('Type', 'Exam'),
+    ('Type', 'Article'),
+    ('Type', 'Thesis'),
+    ('Type', 'Book');
+
+CREATE TABLE item_classes (
+    item_id INTEGER NOT NULL,
+    class_id INTEGER NOT NULL,
+    PRIMARY KEY (item_id, class_id),
+    FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
+    FOREIGN KEY (class_id) REFERENCES classes (id)
+) WITHOUT ROWID;

@@ -1,0 +1,27 @@
+{% macro class_choices(all_classes, selected) %}
+{% for title, options in all_classes.items() %}
+<fieldset class="classes">
+	<legend>{{ title }}</legend>
+	{% for option in options %}
+	<label>
+		<input type="checkbox" name="classes" value="{{ option.id }}"
+			{{ "checked" if option.id in selected }} />
+		{{ option.value }}
+	</label>
+	{% endfor %}
+</fieldset>
+{% endfor %}
+{% endmacro %}
+
+{% macro class_list(classes) %}
+{% if classes %}
+<dl class="item-classes">
+	{% for title, values in classes.items() %}
+	<div>
+		<dt>{{ title }}</dt>
+		<dd>{{ values | join(", ") }}</dd>
+	</div>
+	{% endfor %}
+</dl>
+{% endif %}
+{% endmacro %}

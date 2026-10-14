@@ -73,10 +73,51 @@ def _insert_keywords(con: sqlite3.Connection, item_id: int, keywords: Sequence[s
     )
 
 
+def get_all_classes() -> dict[str, list[sqlite3.Row]]:
+    """Selectable classes by title"""
+    classes: dict[str, list[sqlite3.Row]] = {}
+    for row in db.query("SELECT id, title, value FROM classes ORDER BY id"):
+        classes.setdefault(row["title"], []).append(row)
+    return classes
+
+
+def get_item_classes(item_id: int) -> dict[str, list[str]]:
+    """The item's classes by title: {"Type": ["Exam"], "Language": ["English"]}"""
+    query = """
+        SELECT classes.title, classes.value
+        FROM item_classes
+        JOIN classes ON classes.id = item_classes.class_id
+        WHERE item_classes.item_id = ?
+        ORDER BY classes.id
+    """
+    classes: dict[str, list[str]] = {}
+    for row in db.query(query, [item_id]):
+        classes.setdefault(row["title"], []).append(row["value"])
+    return classes
+
+
+def get_item_class_ids(item_id: int) -> list[int]:
+    """IDs of the item's classes"""
+    rows = db.query("SELECT class_id FROM item_classes WHERE item_id = ?", [item_id])
+    return [row["class_id"] for row in rows]
+
+
+def _insert_classes(con: sqlite3.Connection, item_id: int, class_ids: Sequence[int]) -> None:
+    con.executemany(
+        "INSERT INTO item_classes (item_id, class_id) VALUES (?, ?)",
+        [(item_id, class_id) for class_id in class_ids],
+    )
+
+
 def create_item(
-    user_id: int, title: str, filename: str, pdf_data: bytes, keywords: Sequence[str] = ()
+    user_id: int,
+    title: str,
+    filename: str,
+    pdf_data: bytes,
+    keywords: Sequence[str] = (),
+    class_ids: Sequence[int] = (),
 ) -> int | None:
-    """New items owned by user_id are linked with its keywords"""
+    """New items owned by user_id are linked with its keywords and classes"""
 
     query = """
         INSERT INTO items (user_id, title, filename)
@@ -89,6 +130,7 @@ def create_item(
                 "INSERT INTO item_files (item_id, pdf_data) VALUES (?, ?)", [item_id, pdf_data]
             )
             _insert_keywords(con, item_id, keywords)
+            _insert_classes(con, item_id, class_ids)
 
     return item_id
 
@@ -154,8 +196,9 @@ def edit_item(
     filename: str | None = None,
     pdf_data: bytes | None = None,
     keywords: Sequence[str] | None = None,
+    class_ids: Sequence[int] | None = None,
 ) -> None:
-    """Edit an item's title, PDF or keywords"""
+    """Edit an item's title, PDF, keywords or classes"""
 
     with db.transaction() as con:
         if filename is not None and pdf_data is not None:
@@ -177,6 +220,10 @@ def edit_item(
         if keywords is not None:
             con.execute("DELETE FROM item_keywords WHERE item_id = ?", [item_id])
             _insert_keywords(con, item_id, keywords)
+
+        if class_ids is not None:
+            con.execute("DELETE FROM item_classes WHERE item_id = ?", [item_id])
+            _insert_classes(con, item_id, class_ids)
 
 
 def _like_pattern(text: str) -> str:

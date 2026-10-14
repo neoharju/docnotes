@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "items/classes.html" import class_choices %}
 
 {% block title %}Upload a PDF{% endblock %}
 
@@ -14,6 +15,7 @@
 	<input type="text" id="keywords" name="keywords" value="{{ filled.keywords }}"
 		   maxlength="400" placeholder="keywords (comma-separated): e.g. cs,physics,ml" />
 	</p>
+	{{ class_choices(all_classes, filled.classes or []) }}
 	<p>
 	<label for="pdf">PDF file (max {{ max_pdf_mb}} MB):</label><br />
 	<input type="file" id="pdf" name="pdf" accept="application/pdf" required

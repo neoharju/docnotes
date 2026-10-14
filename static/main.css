@@ -338,6 +338,56 @@ input[type="file"]::file-selector-button {
 	background: #66d3fa;
 }
 
+.classes {
+	box-sizing: border-box;
+	max-width: 30em;
+	margin: 0 auto 12px;
+	padding: 6px 14px 10px;
+	text-align: left;
+	border: 2px solid #3c99dc;
+	border-radius: 10px;
+}
+
+.classes legend {
+	padding: 0 6px;
+	font-weight: bold;
+	color: #0f5298;
+}
+
+.classes label {
+	display: inline-block;
+	margin: 4px 14px 0 0;
+	color: black;
+	white-space: nowrap;
+}
+
+.item-classes {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 6px 20px;
+	margin: 10px 0;
+}
+
+.item-classes div {
+	display: flex;
+	gap: 6px;
+}
+
+.item-classes dt {
+	font-weight: bold;
+	color: #0f5298;
+}
+
+.item-classes dt::after {
+	content: ":";
+}
+
+.item-classes dd {
+	margin: 0;
+	color: black;
+}
+
 .sort-links {
 	display: flex;
 	flex-wrap: wrap;
@@ -392,15 +442,22 @@ input[type="file"]::file-selector-button {
 .items-table th,
 .items-table td {
 	padding: 10px 14px;
-	vertical-aligh: top;
+	vertical-align: top;
 }
 
 .items-table th {
 	color: white;
-	background: #0f5298;
+	background: #2878b8;
+}
+.items-table td {
+	transition: background-color 0.1s ease;
 }
 .items-table tr:nth-child(odd) td {
 	background: #eef9fe;
+}
+
+.items-table tr:hover td {
+	background: #b3e5fc;
 }
 
 .items-table .date {
