@@ -1,5 +1,6 @@
 """Flask app entry point"""
 
+import math
 import secrets
 import sqlite3
 from io import BytesIO
@@ -67,6 +68,13 @@ def form_classes() -> dict[str, object]:
     return {}
 
 
+def _page(item_count: int) -> tuple[int, int]:
+    """The page number in ?page= in url"""
+    page_count = max(1, math.ceil(item_count / items.PAGE_SIZE))
+    page = request.args.get("page", 1, type=int)
+    return min(max(page, 1), page_count), page_count
+
+
 def _selected_class_ids() -> list[int]:
     """IDs of the classes"""
 
@@ -106,7 +114,7 @@ def http_error(error: HTTPException) -> ResponseReturnValue:
 @app.route("/")
 def index() -> str:
     """Home page"""
-    return render_template("index.html", items=items.get_all_items(limit=3))
+    return render_template("index.html", items=items.get_items(limit=3))
 
 
 # helper function to start session
@@ -200,15 +208,19 @@ def item_list() -> ResponseReturnValue:
     if len(search) > 200 or len(keyword) > items.MAX_KEYWORD_LENGTH:
         abort(400, "Search query too long")
 
-    if keyword:
-        all_items = items.get_items_with_keyword(keyword, sort)
-    elif search:
-        all_items = items.search_items(search, sort)
-    else:
-        all_items = items.get_all_items(sort)
+    page, page_count = _page(items.count_items(search, keyword))
+    page_items = items.get_items(
+        search, keyword, sort=sort, limit=items.PAGE_SIZE, offset=(page - 1) * items.PAGE_SIZE
+    )
 
     return render_template(
-        "items/list.html", items=all_items, search=search, keyword=keyword, sort=sort
+        "items/list.html",
+        items=page_items,
+        search=search,
+        keyword=keyword,
+        sort=sort,
+        page=page,
+        page_count=page_count,
     )
 
 
@@ -349,10 +361,18 @@ def user_profile(user_id: int) -> ResponseReturnValue:
     if profile_user is None:
         abort(404)
 
-    user_items = items.get_all_user_items(user_id)
     stats = users.get_stats(user_id)
+    page, page_count = _page(stats["pdfs"])
+    user_items = items.get_items(
+        user_id=user_id, limit=items.PAGE_SIZE, offset=(page - 1) * items.PAGE_SIZE
+    )
     return render_template(
-        "users/profile.html", profile_user=profile_user, items=user_items, stats=stats
+        "users/profile.html",
+        profile_user=profile_user,
+        items=user_items,
+        stats=stats,
+        page=page,
+        page_count=page_count,
     )
 
 

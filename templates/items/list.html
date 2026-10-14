@@ -2,6 +2,7 @@
 {% from "items/search.html" import search_form %}
 {% from "items/table.html" import items_table %}
 {% from "items/keywords.html" import keyword_chips %}
+{% from "pager.html" import pager %}
 
 {% block title %}Docs{% endblock %}
 
@@ -33,6 +34,7 @@
 		{% endfor %}
 	</p>
 	{{ items_table(items) }}
+	{{ pager(page, page_count) }}
 {% else %}
 	<p>No items found</p>
 {% endif %}

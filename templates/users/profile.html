@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% from "items/table.html" import items_table %}
+{% from "pager.html" import pager %}
 
 {% block title %}{{ profile_user.username }}{% endblock %}
 
@@ -16,6 +17,7 @@
 
 {% if items %}
 	{{ items_table(items, show_uploader=false) }}
+	{{ pager(page, page_count) }}
 {% else %}
 	<p>No items uploaded yet.</p>
 {% endif %}

@@ -1,0 +1,15 @@
+{% macro pager(page, page_count) %}
+{% if page_count > 1 %}
+{# links to the same page with the same search, keyword and sort #}
+{% set args = dict(request.args.to_dict(), **request.view_args) %}
+<nav class="pager" aria-label="Pages">
+	{% if page > 1 %}
+		<a href="{{ url_for(request.endpoint, **dict(args, page=page - 1)) }}">&lt;&lt; Previous</a>
+	{% endif %}
+	<span>Page {{ page }} / {{ page_count }}</span>
+	{% if page < page_count %}
+		<a href="{{ url_for(request.endpoint, **dict(args, page=page + 1)) }}">Next &gt;&gt;</a>
+	{% endif %}
+</nav>
+{% endif %}
+{% endmacro %}

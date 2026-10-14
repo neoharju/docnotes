@@ -10,6 +10,7 @@ import db
 MAX_KEYWORDS = 10
 MAX_KEYWORD_LENGTH = 30
 MAX_KEYWORDS_TEXT_LENGTH = 400
+PAGE_SIZE = 20
 
 # keywords are separated by comma, so we split with this
 _KEYWORD_RE = re.compile(r"\w[\w +#.\-]*")
@@ -149,17 +150,61 @@ def get_item(item_id: int) -> sqlite3.Row | None:
     return rows[0] if rows else None
 
 
-def get_all_items(sort: str = "recent", limit: int = -1) -> list[sqlite3.Row]:
-    """All items in SORT_ORDERS[sort] order"""
+def _filter(search: str, keyword: str, user_id: int | None) -> tuple[str, list[object]]:
+    """WHERE condition"""
 
+    if keyword:
+        return "items.id IN (SELECT item_id FROM item_keywords WHERE keyword = ?)", [keyword]
+
+    if search:
+        pattern = _like_pattern(search)
+        condition = """
+            (items.title LIKE ? ESCAPE '\\'
+             OR items.filename LIKE ? ESCAPE '\\'
+             OR users.username LIKE ? ESCAPE '\\'
+             OR EXISTS (SELECT 1 FROM item_keywords
+                        WHERE item_keywords.item_id = items.id
+                          AND item_keywords.keyword LIKE ? ESCAPE '\\'))
+        """
+        return condition, [pattern, pattern, pattern, _like_pattern(normalize_keyword(search))]
+
+    if user_id is not None:
+        return "items.user_id = ?", [user_id]
+
+    return "1", []
+
+
+def get_items(
+    search: str = "",
+    keyword: str = "",
+    user_id: int | None = None,
+    sort: str = "recent",
+    limit: int = -1,
+    offset: int = 0,
+) -> list[sqlite3.Row]:
+    """Items with the keyword, matching text, uploaded by user or all items"""
+    condition, params = _filter(search, keyword, user_id)
     query = f"""
-        SELECT {_METADATA_COLS} 
+        SELECT {_METADATA_COLS}
         FROM items
         JOIN users ON items.user_id = users.id
+        WHERE {condition}
         ORDER BY {SORT_ORDERS[sort]}
-        LIMIT ?
+        LIMIT ? OFFSET ?
     """
-    return db.query(query, [limit])
+    return db.query(query, [*params, limit, offset])
+
+
+def count_items(search: str = "", keyword: str = "", user_id: int | None = None) -> int:
+    """Count how many items get_items() finds"""
+    condition, params = _filter(search, keyword, user_id)
+    query = f"""
+        SELECT count(*)
+        FROM items
+        JOIN users ON items.user_id = users.id
+        WHERE {condition}
+    """
+    return int(db.query(query, params)[0][0])
 
 
 def get_item_pdf(item_id: int) -> sqlite3.Row | None:
@@ -174,20 +219,6 @@ def get_item_pdf(item_id: int) -> sqlite3.Row | None:
 
     rows = db.query(query, [item_id])
     return rows[0] if rows else None
-
-
-def get_all_user_items(user_id: int) -> list[sqlite3.Row] | None:
-    """Return user's items sorted by most recent, else None"""
-
-    query = f"""
-        SELECT {_METADATA_COLS}
-        FROM items
-        JOIN users ON items.user_id = users.id
-        WHERE items.user_id = ?
-        ORDER BY items.id DESC
-    """
-    rows = db.query(query, [user_id])
-    return rows if rows else None
 
 
 def edit_item(
@@ -230,42 +261,6 @@ def _like_pattern(text: str) -> str:
     """Substring pattern: LIKE ... ESCAPE '\\' with % and _ in text"""
     escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     return f"%{escaped}%"
-
-
-def search_items(text: str, sort: str = "recent") -> list[sqlite3.Row]:
-    """Search titles, filenames, uploaders and keywords by literal substring."""
-
-    pattern = _like_pattern(text)
-    keyword_pattern = _like_pattern(normalize_keyword(text))
-
-    query = f"""
-        SELECT {_METADATA_COLS}
-        FROM items
-        JOIN users ON items.user_id = users.id
-        WHERE items.title LIKE ? ESCAPE '\\'
-           OR items.filename LIKE ? ESCAPE '\\'
-           OR users.username LIKE ? ESCAPE '\\'
-           OR EXISTS (SELECT 1 FROM item_keywords
-                      WHERE item_keywords.item_id = items.id
-                        AND item_keywords.keyword LIKE ? ESCAPE '\\')
-        ORDER BY {SORT_ORDERS[sort]}
-    """
-
-    return db.query(query, [pattern, pattern, pattern, keyword_pattern])
-
-
-def get_items_with_keyword(keyword: str, sort: str = "recent") -> list[sqlite3.Row]:
-    """Items tagged with exactly this keyword, in SORT_ORDERS[sort] order"""
-
-    query = f"""
-        SELECT {_METADATA_COLS}
-        FROM items
-        JOIN users ON items.user_id = users.id
-        WHERE items.id IN (SELECT item_id FROM item_keywords WHERE keyword = ?)
-        ORDER BY {SORT_ORDERS[sort]}
-    """
-
-    return db.query(query, [keyword])
 
 
 def delete_item(item_id: int) -> None:

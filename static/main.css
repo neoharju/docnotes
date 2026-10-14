@@ -433,6 +433,14 @@ input[type="file"]::file-selector-button {
 	background: #0f5298;
 }
 
+.pager {
+	margin: 15px 0;
+}
+
+.pager span {
+	color: #0f5298;
+}
+
 .keyword-filter {
 	display: flex;
 	justify-content: center;
