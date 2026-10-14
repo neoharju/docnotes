@@ -1,6 +1,7 @@
 {% macro search_form(search="", sort="recent") %}
 <form class="search-form" action="{{ url_for('item_list') }}" method="get">
-	<input type="text" name="search" value="{{ search }}" maxlength="200" aria-label="Search PDFs"
+	<label for="search" class="visually-hidden">Search PDFs</label>
+	<input type="text" id="search" name="search" value="{{ search }}" maxlength="200"
 				 placeholder="Search by title, filename, uploader or keyword..." />
 	{% if sort != "recent" %}
 		<input type="hidden" name="sort" value="{{ sort }}" />

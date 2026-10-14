@@ -53,19 +53,3 @@ def get_stats(user_id: int) -> sqlite3.Row:
              WHERE items.user_id = ? AND comments.user_id != ?) AS comments_received
     """
     return db.query(query, [user_id] * 4)[0]
-
-
-def get_messages(user_id: int) -> None:
-    """Get user messages"""
-
-
-def get_papers(user_id: int) -> None:
-    """Get user submitted papers"""
-
-
-def set_image(user_id: int, image: bytes) -> None:
-    """Set user image"""
-
-
-def get_image(user_id: int) -> bytes | None:
-    """Get user image"""

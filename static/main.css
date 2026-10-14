@@ -150,6 +150,19 @@ nav .link-button:focus-visible {
 	text-align: center;
 }
 
+.auth-form label {
+	color: #0f5298;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
 .auth-form input[type="text"],
 .auth-form input[type="password"] {
 	border-radius: 10px;

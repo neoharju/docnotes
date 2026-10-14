@@ -72,6 +72,7 @@ on {{ item.created_at }}
 {% if session.user_id %}
 	<form action="{{ url_for('comment_new', item_id=item.id) }}" method="post">
 		<p>
+			<label for="content">Write a comment</label><br />
 			<textarea id="content" name="content" rows="7" maxlength="2000" required></textarea>
 		</p>
 		<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
