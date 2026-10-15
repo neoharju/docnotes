@@ -1,0 +1,6 @@
+# Pylint settings
+
+[MAIN]
+# skip venv and uv created src/ folder,
+# which are both git ignored
+ignore=.venv,venv,src

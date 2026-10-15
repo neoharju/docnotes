@@ -3,6 +3,8 @@
 import os
 
 
+# These are just configs
+# pylint: disable=too-few-public-methods
 class Config:
     """App confs"""
 

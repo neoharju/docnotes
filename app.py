@@ -114,8 +114,8 @@ def http_error(error: HTTPException) -> ResponseReturnValue:
 
 @app.route("/")
 def index() -> str:
-    """Home page"""
-    return render_template("index.html", items=items.get_items(limit=3))
+    """Home page with the three latest PDFs"""
+    return render_template("index.html", items=items.get_items()[:3])
 
 
 # helper function to start session
@@ -210,9 +210,7 @@ def item_list() -> ResponseReturnValue:
         abort(400, "Search query too long")
 
     page, page_count = _page(items.count_items(search, keyword))
-    page_items = items.get_items(
-        search, keyword, sort=sort, limit=items.PAGE_SIZE, offset=(page - 1) * items.PAGE_SIZE
-    )
+    page_items = items.get_items(search, keyword, sort=sort, page=page)
 
     return render_template(
         "items/list.html",
@@ -263,10 +261,9 @@ def item_new() -> ResponseReturnValue:
         return render_template("items/new.html", filled=filled)
 
     filename = secure_filename(uploaded_file.filename or "") or "doc.pdf"
+    pdf = items.PdfFile(filename, pdf_data)
 
-    item_id = items.create_item(
-        user_id, title, filename, pdf_data, keywords=keywords, class_ids=class_ids
-    )
+    item_id = items.create_item(user_id, title, pdf, keywords=keywords, class_ids=class_ids)
     return redirect(f"/items/{item_id}")
 
 
@@ -315,6 +312,7 @@ def item_edit(item_id: int) -> ResponseReturnValue:
         flash(str(error))
         return render_template("items/edit.html", item=item, filled=filled)
 
+    pdf: items.PdfFile | None = None
     replacement = request.files.get("pdf")
     if replacement is not None and replacement.filename:
         try:
@@ -323,10 +321,9 @@ def item_edit(item_id: int) -> ResponseReturnValue:
             flash(str(error))
             return render_template("items/edit.html", item=item, filled=filled)
         filename = secure_filename(replacement.filename) or item["filename"]
-        items.edit_item(item_id, title, filename, pdf_data, keywords=keywords, class_ids=class_ids)
-    else:
-        items.edit_item(item_id, title, keywords=keywords, class_ids=class_ids)
+        pdf = items.PdfFile(filename, pdf_data)
 
+    items.edit_item(item_id, title, pdf, keywords=keywords, class_ids=class_ids)
     return redirect(f"/items/{item_id}")
 
 
@@ -367,9 +364,7 @@ def user_profile(user_id: int) -> ResponseReturnValue:
 
     stats = users.get_stats(user_id)
     page, page_count = _page(stats["pdfs"])
-    user_items = items.get_items(
-        user_id=user_id, limit=items.PAGE_SIZE, offset=(page - 1) * items.PAGE_SIZE
-    )
+    user_items = items.get_items(user_id=user_id, page=page)
     return render_template(
         "users/profile.html",
         profile_user=profile_user,

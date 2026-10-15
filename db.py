@@ -21,7 +21,7 @@ def execute(sql: str, params: list[Any] | None = None) -> None:
     if params is None:
         params = []
 
-    with closing(get_connection()) as con, con:
+    with transaction() as con:
         result = con.execute(sql, params)
 
     g.last_insert_id = result.lastrowid
@@ -30,8 +30,13 @@ def execute(sql: str, params: list[Any] | None = None) -> None:
 @contextmanager
 def transaction() -> Iterator[sqlite3.Connection]:
     """commit if block finishes or cancel/roll back if it raises an error"""
-    with closing(get_connection()) as con, con:
-        yield con
+    con = get_connection()
+    try:
+        # "with con" commits or rolls back, but it does not close the connection
+        with con:
+            yield con
+    finally:
+        con.close()
 
 
 def last_insert_id() -> int | None:

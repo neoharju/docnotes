@@ -4,6 +4,7 @@ import re
 import sqlite3
 import unicodedata
 from collections.abc import Sequence
+from typing import NamedTuple
 
 import db
 
@@ -28,6 +29,14 @@ SORT_ORDERS = {
     "recent": "items.id DESC",
     "comments": "comment_count DESC, items.id DESC",
 }
+
+
+# helper class to go around pylints 6/5 function args complaint
+class PdfFile(NamedTuple):
+    """An uploaded PDF: its file name and contents"""
+
+    filename: str
+    data: bytes
 
 
 def normalize_keyword(text: str) -> str:
@@ -113,8 +122,7 @@ def _insert_classes(con: sqlite3.Connection, item_id: int, class_ids: Sequence[i
 def create_item(
     user_id: int,
     title: str,
-    filename: str,
-    pdf_data: bytes,
+    pdf: PdfFile,
     *,
     keywords: Sequence[str] = (),
     class_ids: Sequence[int] = (),
@@ -126,10 +134,10 @@ def create_item(
         values (?, ?, ?)
     """
     with db.transaction() as con:
-        item_id = con.execute(query, [user_id, title, filename]).lastrowid
+        item_id = con.execute(query, [user_id, title, pdf.filename]).lastrowid
         if item_id is not None:
             con.execute(
-                "INSERT INTO item_files (item_id, pdf_data) VALUES (?, ?)", [item_id, pdf_data]
+                "INSERT INTO item_files (item_id, pdf_data) VALUES (?, ?)", [item_id, pdf.data]
             )
             _insert_keywords(con, item_id, keywords)
             _insert_classes(con, item_id, class_ids)
@@ -181,10 +189,9 @@ def get_items(
     *,
     user_id: int | None = None,
     sort: str = "recent",
-    limit: int = -1,
-    offset: int = 0,
+    page: int = 1,
 ) -> list[sqlite3.Row]:
-    """Items with the keyword, matching text, uploaded by user or all items"""
+    """One page of the items with the keyword, matching text, uploaded by user or all items"""
     condition, params = _filter(search, keyword, user_id)
     query = f"""
         SELECT {_METADATA_COLS}
@@ -194,7 +201,7 @@ def get_items(
         ORDER BY {SORT_ORDERS[sort]}
         LIMIT ? OFFSET ?
     """
-    return db.query(query, [*params, limit, offset])
+    return db.query(query, [*params, PAGE_SIZE, (page - 1) * PAGE_SIZE])
 
 
 def count_items(search: str = "", keyword: str = "", user_id: int | None = None) -> int:
@@ -226,8 +233,7 @@ def get_item_pdf(item_id: int) -> sqlite3.Row | None:
 def edit_item(
     item_id: int,
     title: str,
-    filename: str | None = None,
-    pdf_data: bytes | None = None,
+    pdf: PdfFile | None = None,
     *,
     keywords: Sequence[str] | None = None,
     class_ids: Sequence[int] | None = None,
@@ -235,14 +241,14 @@ def edit_item(
     """Edit an item's title, PDF, keywords or classes"""
 
     with db.transaction() as con:
-        if filename is not None and pdf_data is not None:
+        if pdf is not None:
             query = """
                 UPDATE items
                 SET title = ?, filename = ?
                 WHERE id = ?
             """
-            con.execute(query, [title, filename, item_id])
-            con.execute("UPDATE item_files SET pdf_data = ? WHERE item_id = ?", [pdf_data, item_id])
+            con.execute(query, [title, pdf.filename, item_id])
+            con.execute("UPDATE item_files SET pdf_data = ? WHERE item_id = ?", [pdf.data, item_id])
         else:
             query = """
                 UPDATE items
