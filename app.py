@@ -46,6 +46,7 @@ else:
 
 @app.context_processor
 def form_limits() -> dict[str, int]:
+    """Size limits for the form templates"""
     return {
         "max_pdf_mb": app.config["MAX_PDF_SIZE"] // (1024 * 1024),
         "min_password_length": app.config["MIN_PASSWORD_LENGTH"],
@@ -263,7 +264,9 @@ def item_new() -> ResponseReturnValue:
 
     filename = secure_filename(uploaded_file.filename or "") or "doc.pdf"
 
-    item_id = items.create_item(user_id, title, filename, pdf_data, keywords, class_ids)
+    item_id = items.create_item(
+        user_id, title, filename, pdf_data, keywords=keywords, class_ids=class_ids
+    )
     return redirect(f"/items/{item_id}")
 
 
@@ -320,7 +323,7 @@ def item_edit(item_id: int) -> ResponseReturnValue:
             flash(str(error))
             return render_template("items/edit.html", item=item, filled=filled)
         filename = secure_filename(replacement.filename) or item["filename"]
-        items.edit_item(item_id, title, filename, pdf_data, keywords, class_ids)
+        items.edit_item(item_id, title, filename, pdf_data, keywords=keywords, class_ids=class_ids)
     else:
         items.edit_item(item_id, title, keywords=keywords, class_ids=class_ids)
 
@@ -340,6 +343,7 @@ def item_delete(item_id: int) -> ResponseReturnValue:
 
 @app.route("/items/<int:item_id>/pdf")
 def item_pdf(item_id: int) -> ResponseReturnValue:
+    """Send the PDF file to the browser"""
     row = items.get_item_pdf(item_id)
 
     if row is None:

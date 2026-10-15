@@ -51,3 +51,8 @@ python3 seed.py
 ```
 
 With simulated data the Measured Largest Contentful Paint (LCP) seems to max out at 0.24s when hosted locally.
+
+## Code quality
+
+The Pylint report can be found here
+[pylint-report.md](pylint-report.md).

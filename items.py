@@ -115,6 +115,7 @@ def create_item(
     title: str,
     filename: str,
     pdf_data: bytes,
+    *,
     keywords: Sequence[str] = (),
     class_ids: Sequence[int] = (),
 ) -> int | None:
@@ -140,7 +141,7 @@ def get_item(item_id: int) -> sqlite3.Row | None:
     """Search all users for item based on id, else None"""
 
     query = f"""
-        SELECT {_METADATA_COLS} 
+        SELECT {_METADATA_COLS}
         FROM items
         JOIN users ON items.user_id = users.id
         WHERE items.id = ?
@@ -177,6 +178,7 @@ def _filter(search: str, keyword: str, user_id: int | None) -> tuple[str, list[o
 def get_items(
     search: str = "",
     keyword: str = "",
+    *,
     user_id: int | None = None,
     sort: str = "recent",
     limit: int = -1,
@@ -226,6 +228,7 @@ def edit_item(
     title: str,
     filename: str | None = None,
     pdf_data: bytes | None = None,
+    *,
     keywords: Sequence[str] | None = None,
     class_ids: Sequence[int] | None = None,
 ) -> None:

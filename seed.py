@@ -19,10 +19,10 @@ KEYWORDS = [
     "biology",
     "medicine",
     "quantum computing",
-    "AdS/CFT",
+    "ads/cft",
     "cryptography",
     "electronics",
-    "SIMD",
+    "simd",
 ]
 
 # pdf starts with b"%PDF

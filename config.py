@@ -9,7 +9,7 @@ class Config:
     try:
         SECRET_KEY = os.environ["SECRET_KEY"]
     except KeyError:
-        raise KeyError("SECRET_KEY missing from env")
+        raise KeyError("SECRET_KEY missing from env") from None
 
     DATABASE = "database.db"
 
