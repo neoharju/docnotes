@@ -39,33 +39,45 @@ def main() -> None:
     if not class_ids:
         raise SystemExit("No classes in the database: Do `sqlite3 database.db < schema.sql` first")
 
+    # Generate data on top of existing data
+    first_user = con.execute("SELECT coalesce(max(id), 0) + 1 FROM users").fetchone()[0]
+    first_item = con.execute("SELECT coalesce(max(id), 0) + 1 FROM items").fetchone()[0]
+    user_ids = range(first_user, first_user + USER_COUNT)
+    item_ids = range(first_item, first_item + ITEM_COUNT)
+
     password_hash = generate_password_hash("my_test_password")
 
     # Add USER_COUNT=1000 users
     con.executemany(
-        "INSERT INTO users (username, password_hash) VALUES (?, ?)",
-        ((f"user{i}", password_hash) for i in range(1, USER_COUNT + 1)),
+        "INSERT INTO users (id, username, password_hash) VALUES (?, ?, ?)",
+        ((user_id, f"user{user_id}", password_hash) for user_id in user_ids),
     )
     # Add ITEM_COUNT=10**5 items
     con.executemany(
-        """INSERT INTO items (user_id, title, filename, created_at)
-           VALUES (?, ?, ?, datetime('now', ?))""",
+        """INSERT INTO items (id, user_id, title, filename, created_at)
+           VALUES (?, ?, ?, ?, datetime('now', ?))""",
         (
-            (random.randint(1, USER_COUNT), f"PDF {i}", f"pdf{i}.pdf", f"-{ITEM_COUNT - i} minutes")
-            for i in range(1, ITEM_COUNT + 1)
+            (
+                item_id,
+                random.choice(user_ids),
+                f"PDF {item_id}",
+                f"pdf{item_id}.pdf",
+                f"-{item_ids[-1] - item_id} minutes",
+            )
+            for item_id in item_ids
         ),
     )
 
     con.executemany(
         "INSERT INTO item_files (item_id, pdf_data) VALUES (?, ?)",
-        ((i, PDF_DATA) for i in range(1, ITEM_COUNT + 1)),
+        ((item_id, PDF_DATA) for item_id in item_ids),
     )
 
     con.executemany(
         "INSERT INTO item_keywords (item_id, keyword) VALUES (?, ?)",
         (
-            (i, keyword)
-            for i in range(1, ITEM_COUNT + 1)
+            (item_id, keyword)
+            for item_id in item_ids
             for keyword in random.sample(KEYWORDS, random.randint(0, 3))
         ),
     )
@@ -73,8 +85,8 @@ def main() -> None:
     con.executemany(
         "INSERT INTO item_classes (item_id, class_id) VALUES (?, ?)",
         (
-            (i, class_id)
-            for i in range(1, ITEM_COUNT + 1)
+            (item_id, class_id)
+            for item_id in item_ids
             for class_id in random.sample(class_ids, random.randint(1, 3))
         ),
     )
@@ -83,7 +95,7 @@ def main() -> None:
     con.executemany(
         "INSERT INTO comments (item_id, user_id, content) VALUES (?, ?, ?)",
         (
-            (random.randint(1, ITEM_COUNT), random.randint(1, USER_COUNT), f"comment {i}")
+            (random.choice(item_ids), random.choice(user_ids), f"comment {i}")
             for i in range(1, COMMENT_COUNT + 1)
         ),
     )
