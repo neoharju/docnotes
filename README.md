@@ -1,16 +1,16 @@
-# DocNotes (Proof-of-Concept)
+# DocNotes
 
 Read and review research papers together!
 
 
-## Full Future Application Features
+## Application Features
 
 - Users can create an account and log in to the application.
 - Users can add, edit and delete their research paper information.
 - Users can attach a PDF file to a research paper.
-- Users can view research papers added to the application and read their PDF files.
+- Users can view research papers added to the application as PDF files.
 - Users can classify their research papers (e.g. field, topic, ...)
-- Users can search for research papers by keyword and tags.
+- Users can search for research papers by keyword, title, username.
 - Users have profile pages that display statics and research papers they have added.
 - Users can add comments to their own and others users' research papers.
 
