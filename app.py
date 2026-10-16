@@ -6,17 +6,6 @@ import sqlite3
 from io import BytesIO
 from os import environ
 
-import comments
-import items
-import users
-from auth import (
-    authenticate_user,
-    check_csrf,
-    require_owner,
-    require_user_id,
-    safe_redirect_url,
-)
-from config import Config, DevConfig, TestConfig
 from flask import (
     Flask,
     abort,
@@ -29,9 +18,21 @@ from flask import (
     session,
 )
 from flask.typing import ResponseReturnValue
-from uploads import UploadError, read_pdf
 from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
 from werkzeug.utils import secure_filename
+
+import comments
+import items
+import users
+from auth import (
+    authenticate_user,
+    check_csrf,
+    require_owner,
+    require_user_id,
+    safe_redirect_url,
+)
+from config import Config, DevConfig, TestConfig
+from uploads import UploadError, read_pdf
 
 app = Flask(__name__)
 
@@ -142,13 +143,21 @@ def register() -> ResponseReturnValue:
     # Helper function for repetetive code
     def retry(message: str) -> str:
         flash(message)
-        return render_template("register.html", next_page=next_page, filled={"username": username})
+        return render_template(
+            "register.html", next_page=next_page, filled={"username": username}
+        )
 
     if not _lim["min_username_length"] <= len(username) <= _lim["max_username_length"]:
         return retry("Username should be between 2 and 20 characters")
 
-    if not _lim["min_password_length"] <= len(password_1) <= _lim["max_password_length"]:
-        return retry(f"Password must be at least {_lim['min_password_length']} characters")
+    if (
+        not _lim["min_password_length"]
+        <= len(password_1)
+        <= _lim["max_password_length"]
+    ):
+        return retry(
+            f"Password must be at least {_lim['min_password_length']} characters"
+        )
 
     if password_1 != password_2:
         return retry("The passwords do not match!")
@@ -176,12 +185,15 @@ def login() -> ResponseReturnValue:
     next_page = safe_redirect_url(request.form.get("next_page", "/"))
 
     check_length = (
-        len(username) > _lim["max_username_length"] or len(password) > _lim["max_password_length"]
+        len(username) > _lim["max_username_length"]
+        or len(password) > _lim["max_password_length"]
     )
     user_id = None if check_length else authenticate_user(username, password)
     if user_id is None:
         flash("Wrong username or password")
-        return render_template("login.html", next_page=next_page, filled={"username": username})
+        return render_template(
+            "login.html", next_page=next_page, filled={"username": username}
+        )
 
     _start_session(user_id, username)
 
@@ -263,7 +275,9 @@ def item_new() -> ResponseReturnValue:
     filename = secure_filename(uploaded_file.filename or "") or "doc.pdf"
     pdf = items.PdfFile(filename, pdf_data)
 
-    item_id = items.create_item(user_id, title, pdf, keywords=keywords, class_ids=class_ids)
+    item_id = items.create_item(
+        user_id, title, pdf, keywords=keywords, class_ids=class_ids
+    )
     return redirect(f"/items/{item_id}")
 
 

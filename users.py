@@ -3,8 +3,9 @@
 
 import sqlite3
 
-import db
 from werkzeug.security import generate_password_hash
+
+import db
 
 
 def create_user(username: str, password: str) -> int:

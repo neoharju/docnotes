@@ -5,9 +5,10 @@ import secrets
 import sqlite3
 from urllib.parse import urlparse
 
-import db
 from flask import abort, flash, redirect, request, session, url_for
 from werkzeug.security import check_password_hash
+
+import db
 
 
 def authenticate_user(username: str, password: str) -> int | None:
@@ -69,10 +70,10 @@ def check_csrf() -> None:
     session_token = session.get("csrf_token")
 
     if (
-        form_token is None
-        or session_token is None
-        or not secrets.compare_digest(form_token, session_token)
-    ):
+            form_token is None
+            or session_token is None
+            or not secrets.compare_digest(form_token, session_token)
+            ):
         abort(403)
 
 
